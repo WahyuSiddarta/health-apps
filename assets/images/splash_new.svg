@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1284 2778">
+  <rect width="1284" height="2778" fill="#ffffff" />
+  <g transform="translate(392, 1000)">
+    <rect width="500" height="500" rx="100" fill="#10b981" />
+    <g transform="translate(55, 55) scale(16.25)">
+      <path fill="#ffffff"
+        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </g>
+    <path d="M122 250 H 185 L 220 146 L 283 353 L 317 250 H 378" stroke="#10b981" stroke-width="20"
+      stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+  <text x="642" y="1650" font-family="Arial, sans-serif" font-size="80" font-weight="bold"
+    fill="#10b981" text-anchor="middle">Health Tracker</text>
+</svg>

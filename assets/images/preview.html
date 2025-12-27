@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asset Preview</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #f0f0f0;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      img {
+        max-width: 300px;
+        border: 1px solid #ddd;
+      }
+      h2 {
+        margin-top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Asset Preview</h1>
+    <p>
+      These are the SVG assets generated for your project. You can convert them
+      to PNG for use in Expo.
+    </p>
+    <div class="container">
+      <div class="card">
+        <h2>App Icon</h2>
+        <img src="logo_new.svg" alt="App Icon" />
+        <p>logo_new.svg</p>
+      </div>
+      <div class="card">
+        <h2>Splash Screen</h2>
+        <img
+          src="splash_new.svg"
+          alt="Splash Screen"
+          style="max-height: 500px"
+        />
+        <p>splash_new.svg</p>
+      </div>
+      <div class="card">
+        <h2>Adaptive Icon Foreground</h2>
+        <img
+          src="adaptive_icon_foreground.svg"
+          alt="Adaptive Icon Foreground"
+          style="background: #ccc"
+        />
+        <p>adaptive_icon_foreground.svg</p>
+      </div>
+    </div>
+  </body>
+</html>

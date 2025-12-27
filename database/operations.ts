@@ -2,21 +2,36 @@ import db from "./db";
 
 // --- Exercises ---
 
+export interface ExerciseRecord {
+  id: number;
+  user_id: number;
+  name: string;
+  record_at: string;
+  minute: number | null;
+  caloric: number;
+  intensity: string;
+  type: string;
+}
+
 export const addExercise = (
   name: string,
-  duration: number,
-  calories: number,
-  date: string
+  recordAt: string,
+  minute: number | null,
+  caloric: number,
+  intensity: string,
+  type: string
 ) => {
   try {
     const statement = db.prepareSync(
-      "INSERT INTO exercises (name, duration, calories, date) VALUES ($name, $duration, $calories, $date)"
+      "INSERT INTO exercises (name, record_at, minute, caloric, intensity, type) VALUES ($name, $recordAt, $minute, $caloric, $intensity, $type)"
     );
     const result = statement.executeSync({
       $name: name,
-      $duration: duration,
-      $calories: calories,
-      $date: date,
+      $recordAt: recordAt,
+      $minute: minute,
+      $caloric: caloric,
+      $intensity: intensity,
+      $type: type,
     });
     return result.lastInsertRowId;
   } catch (error) {
@@ -25,9 +40,42 @@ export const addExercise = (
   }
 };
 
-export const getExercises = () => {
+export const getExercises = (filters?: {
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+  type?: string;
+  intensity?: string;
+}): ExerciseRecord[] => {
   try {
-    return db.getAllSync("SELECT * FROM exercises ORDER BY date DESC");
+    let query = "SELECT * FROM exercises WHERE 1=1";
+    const params: any = {};
+
+    if (filters?.date) {
+      query += " AND date(record_at) = date($date)";
+      params.$date = filters.date;
+    }
+
+    if (filters?.startDate && filters?.endDate) {
+      query +=
+        " AND date(record_at) BETWEEN date($startDate) AND date($endDate)";
+      params.$startDate = filters.startDate;
+      params.$endDate = filters.endDate;
+    }
+
+    if (filters?.type) {
+      query += " AND type = $type";
+      params.$type = filters.type;
+    }
+
+    if (filters?.intensity) {
+      query += " AND intensity = $intensity";
+      params.$intensity = filters.intensity;
+    }
+
+    query += " ORDER BY record_at DESC";
+
+    return db.getAllSync(query, params) as ExerciseRecord[];
   } catch (error) {
     console.error("Error getting exercises:", error);
     return [];
@@ -44,7 +92,43 @@ export const deleteExercise = (id: number) => {
   }
 };
 
+export const updateExercise = (
+  id: number,
+  name: string,
+  minute: number | null,
+  caloric: number,
+  intensity: string,
+  type: string
+) => {
+  try {
+    const statement = db.prepareSync(
+      "UPDATE exercises SET name = $name, minute = $minute, caloric = $caloric, intensity = $intensity, type = $type WHERE id = $id"
+    );
+    statement.executeSync({
+      $id: id,
+      $name: name,
+      $minute: minute,
+      $caloric: caloric,
+      $intensity: intensity,
+      $type: type,
+    });
+  } catch (error) {
+    console.error("Error updating exercise:", error);
+    throw error;
+  }
+};
+
 // --- Food ---
+
+export interface FoodRecord {
+  id: number;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  date: string;
+}
 
 export const addFood = (
   name: string,
@@ -73,9 +157,11 @@ export const addFood = (
   }
 };
 
-export const getFoodLogs = () => {
+export const getFoodLogs = (): FoodRecord[] => {
   try {
-    return db.getAllSync("SELECT * FROM food ORDER BY date DESC");
+    return db.getAllSync(
+      "SELECT * FROM food ORDER BY date DESC"
+    ) as FoodRecord[];
   } catch (error) {
     console.error("Error getting food logs:", error);
     return [];
@@ -94,6 +180,12 @@ export const deleteFood = (id: number) => {
 
 // --- Weight ---
 
+export interface WeightRecord {
+  id: number;
+  value: number;
+  date: string;
+}
+
 export const addWeight = (value: number, date: string) => {
   try {
     const statement = db.prepareSync(
@@ -107,9 +199,11 @@ export const addWeight = (value: number, date: string) => {
   }
 };
 
-export const getWeightLogs = () => {
+export const getWeightLogs = (): WeightRecord[] => {
   try {
-    return db.getAllSync("SELECT * FROM weight ORDER BY date DESC");
+    return db.getAllSync(
+      "SELECT * FROM weight ORDER BY date DESC"
+    ) as WeightRecord[];
   } catch (error) {
     console.error("Error getting weight logs:", error);
     return [];
