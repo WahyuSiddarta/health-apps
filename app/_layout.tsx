@@ -22,6 +22,10 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
+            name="personal-target"
+            options={{ headerShown: false, presentation: "card" }}
+          />
+          <Stack.Screen
             name="modal"
             options={{ presentation: "modal", title: "Modal" }}
           />

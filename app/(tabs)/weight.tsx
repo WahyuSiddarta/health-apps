@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { BarChart } from "react-native-gifted-charts";
 
 export default function WeightScreen() {
   const { showToast } = useToast();
@@ -34,13 +35,13 @@ export default function WeightScreen() {
     if (filter !== "Weekly") return [];
 
     const stats = [
-      { day: "Mon", weight: 0, count: 0 },
-      { day: "Tue", weight: 0, count: 0 },
-      { day: "Wed", weight: 0, count: 0 },
-      { day: "Thu", weight: 0, count: 0 },
-      { day: "Fri", weight: 0, count: 0 },
-      { day: "Sat", weight: 0, count: 0 },
-      { day: "Sun", weight: 0, count: 0 },
+      { day: "Mon", weight: 0, count: 0, fat: 0, fatCount: 0 },
+      { day: "Tue", weight: 0, count: 0, fat: 0, fatCount: 0 },
+      { day: "Wed", weight: 0, count: 0, fat: 0, fatCount: 0 },
+      { day: "Thu", weight: 0, count: 0, fat: 0, fatCount: 0 },
+      { day: "Fri", weight: 0, count: 0, fat: 0, fatCount: 0 },
+      { day: "Sat", weight: 0, count: 0, fat: 0, fatCount: 0 },
+      { day: "Sun", weight: 0, count: 0, fat: 0, fatCount: 0 },
     ];
 
     weightLogs.forEach((log) => {
@@ -51,14 +52,51 @@ export default function WeightScreen() {
       if (stats[dayIndex]) {
         stats[dayIndex].weight += log.bodyweight;
         stats[dayIndex].count += 1;
+        if (log.fat_percentage) {
+          stats[dayIndex].fat += log.fat_percentage;
+          stats[dayIndex].fatCount += 1;
+        }
       }
     });
 
     return stats.map((stat) => ({
       day: stat.day,
       avgWeight: stat.count > 0 ? stat.weight / stat.count : 0,
+      avgFat: stat.fatCount > 0 ? stat.fat / stat.fatCount : 0,
     }));
   }, [weightLogs, filter]);
+
+  const chartData = useMemo(() => {
+    return weeklyStats.map((stat) => {
+      const weight = stat.avgWeight;
+
+      if (weight === 0) {
+        return {
+          label: stat.day,
+          value: 0,
+          frontColor: "transparent",
+        };
+      }
+
+      return {
+        label: stat.day,
+        value: weight,
+        frontColor: "#10b981", // emerald-500
+      };
+    });
+  }, [weeklyStats]);
+
+  const lineData = useMemo(() => {
+    return weeklyStats.map((stat) => ({
+      value: stat.avgWeight,
+      dataPointText: stat.avgWeight > 0 ? stat.avgWeight.toFixed(1) : "",
+      hideDataPoint: stat.avgWeight === 0,
+      textShiftY: -10,
+      textShiftX: -5,
+      textColor: "white",
+      textFontSize: 10,
+    }));
+  }, [weeklyStats]);
 
   const maxWeight = useMemo(() => {
     return Math.max(...weeklyStats.map((s) => s.avgWeight), 1);
@@ -176,7 +214,7 @@ export default function WeightScreen() {
     <ScreenWrapper title="Weight">
       <View className="flex-1">
         <ScrollView className="flex-1 p-4">
-          <View className="flex-row justify-between items-center mb-4">
+          <View className="flex-row items-center justify-between mb-4">
             <ThemedText type="subtitle">Recent Measurements</ThemedText>
             <View className="flex-row gap-2">
               <TouchableOpacity
@@ -200,58 +238,53 @@ export default function WeightScreen() {
           </View>
 
           {filter === "Weekly" && (
-            <View className="bg-neutral-900 p-4 rounded-2xl mb-6 border border-neutral-800">
-              <View className="flex-row justify-between items-center mb-6">
-                <Text className="text-white font-bold">
+            <View className="p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
+              <View className="flex-row items-center justify-between mb-6">
+                <Text className="font-bold text-white">
                   Weekly Weight Trend (Avg)
                 </Text>
                 {weeklyAverage > 0 && (
-                  <Text className="text-emerald-500 text-xs font-medium">
+                  <Text className="text-xs font-medium text-emerald-500">
                     Avg: {weeklyAverage.toFixed(1)} kg
                   </Text>
                 )}
               </View>
 
-              <View className="h-40">
-                <View className="absolute inset-0 mx-4 mb-6 justify-end">
-                  {weeklyAverage > 0 && (
-                    <View
-                      className="w-full border-t border-dashed border-emerald-500/50"
-                      style={{
-                        bottom: `${(weeklyAverage / maxWeight) * 100}%`,
-                        position: "absolute",
-                      }}
-                    />
-                  )}
-                </View>
+              <BarChart
+                data={chartData}
+                showLine
+                lineData={lineData}
+                height={200}
+                width={300}
+                spacing={20}
+                initialSpacing={10}
+                noOfSections={4}
+                yAxisThickness={0}
+                xAxisThickness={0}
+                yAxisTextStyle={{ color: "gray" }}
+                xAxisLabelTextStyle={{ color: "gray" }}
+                rulesColor="gray"
+                rulesType="solid"
+                lineConfig={{
+                  color: "#F7B600",
+                  thickness: 2,
+                  curved: true,
+                  hideDataPoints: false,
+                  dataPointsColor: "#F7B600",
+                  dataPointsRadius: 4,
+                }}
+                maxValue={maxWeight + 5}
+                barWidth={20}
+              />
 
-                <View className="flex-1 flex-row justify-between items-end px-2">
-                  {weeklyStats.map((stat) => {
-                    const heightPercentage =
-                      maxWeight > 0 ? (stat.avgWeight / maxWeight) * 100 : 0;
-                    return (
-                      <View key={stat.day} className="items-center w-8">
-                        <View className="h-32 w-full justify-end items-center">
-                          {stat.avgWeight > 0 && (
-                            <Text className="text-white text-[10px] mb-1 absolute -top-5 w-10 text-center">
-                              {stat.avgWeight.toFixed(1)}
-                            </Text>
-                          )}
-                          <View className="w-1.5 bg-neutral-800 rounded-full h-full justify-end overflow-hidden">
-                            <View
-                              style={{
-                                height: `${heightPercentage}%`,
-                              }}
-                              className="bg-emerald-500 w-full rounded-full"
-                            />
-                          </View>
-                        </View>
-                        <Text className="text-neutral-400 text-xs mt-2">
-                          {stat.day}
-                        </Text>
-                      </View>
-                    );
-                  })}
+              <View className="flex-row justify-center gap-4 mt-4">
+                <View className="flex-row items-center gap-2">
+                  <View className="w-3 h-3 rounded-full bg-emerald-500" />
+                  <Text className="text-xs text-neutral-400">Weight</Text>
+                </View>
+                <View className="flex-row items-center gap-2">
+                  <View className="w-3 h-3 bg-[#F7B600] rounded-full" />
+                  <Text className="text-xs text-neutral-400">Weight Trend</Text>
                 </View>
               </View>
             </View>
@@ -260,31 +293,31 @@ export default function WeightScreen() {
           {weightLogs.map((log) => (
             <View
               key={log.id}
-              className="bg-neutral-900 p-4 rounded-2xl mb-3 flex-row justify-between items-center border border-neutral-800"
+              className="flex-row items-center justify-between p-4 mb-3 border bg-neutral-900 rounded-2xl border-neutral-800"
             >
               <View className="flex-1">
-                <Text className="text-white font-bold text-lg">
+                <Text className="text-lg font-bold text-white">
                   {log.bodyweight} kg
                 </Text>
-                <Text className="text-neutral-400 mt-1">
+                <Text className="mt-1 text-neutral-400">
                   {log.fat_percentage ? `Fat: ${log.fat_percentage}% • ` : ""}
                   {log.viceral_fat ? `VF: ${log.viceral_fat} • ` : ""}
                   {log.waist_cm ? `Waist: ${log.waist_cm}cm` : ""}
                 </Text>
-                <Text className="text-neutral-500 text-xs mt-1">
+                <Text className="mt-1 text-xs text-neutral-500">
                   {new Date(log.measured_at).toLocaleString()}
                 </Text>
               </View>
               <View className="flex-col gap-2 ml-2">
                 <TouchableOpacity
                   onPress={() => handleEdit(log)}
-                  className="bg-blue-500/10 p-2 rounded-full"
+                  className="p-2 rounded-full bg-blue-500/10"
                 >
                   <Ionicons name="pencil" size={16} color="#3b82f6" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleDelete(log.id)}
-                  className="bg-red-500/10 p-2 rounded-full"
+                  className="p-2 rounded-full bg-red-500/10"
                 >
                   <Ionicons name="trash" size={16} color="#ef4444" />
                 </TouchableOpacity>
@@ -293,7 +326,7 @@ export default function WeightScreen() {
           ))}
 
           {weightLogs.length === 0 && (
-            <Text className="text-neutral-500 text-center mt-8">
+            <Text className="mt-8 text-center text-neutral-500">
               No measurements recorded yet
             </Text>
           )}
@@ -301,7 +334,7 @@ export default function WeightScreen() {
           <View className="h-20" />
         </ScrollView>
 
-        <View className="p-4 border-t border-neutral-800 bg-black">
+        <View className="p-4 bg-black border-t border-neutral-800">
           <TouchableOpacity
             onPress={() => {
               setWeight("");
@@ -312,9 +345,9 @@ export default function WeightScreen() {
               setEditingId(null);
               setIsFormVisible(true);
             }}
-            className="bg-emerald-600 p-3 rounded-xl items-center shadow-sm active:bg-emerald-700"
+            className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
-            <Text className="text-white font-bold text-lg">
+            <Text className="text-lg font-bold text-white">
               Add New Measurement
             </Text>
           </TouchableOpacity>
@@ -383,9 +416,9 @@ export default function WeightScreen() {
 
           <TouchableOpacity
             onPress={handleSubmit}
-            className="bg-emerald-600 p-3 rounded-xl items-center shadow-sm active:bg-emerald-700"
+            className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
-            <Text className="text-white font-bold text-lg">
+            <Text className="text-lg font-bold text-white">
               {editingId ? "Update Measurement" : "Add Measurement"}
             </Text>
           </TouchableOpacity>
@@ -411,15 +444,15 @@ export default function WeightScreen() {
               onPress={() => {
                 setFilterDate(undefined);
               }}
-              className="flex-1 bg-neutral-800 p-3 rounded-xl items-center"
+              className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
             >
-              <Text className="text-white font-bold">Clear All</Text>
+              <Text className="font-bold text-white">Clear All</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setIsFilterVisible(false)}
-              className="flex-1 bg-emerald-600 p-3 rounded-xl items-center"
+              className="items-center flex-1 p-3 bg-emerald-600 rounded-xl"
             >
-              <Text className="text-white font-bold">Apply Filters</Text>
+              <Text className="font-bold text-white">Apply Filters</Text>
             </TouchableOpacity>
           </View>
         </BottomSheet>

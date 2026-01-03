@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { PieChart } from "react-native-gifted-charts";
 
 export default function FoodScreen() {
   const { showToast } = useToast();
@@ -29,7 +30,7 @@ export default function FoodScreen() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [filter, setFilter] = useState<"Weekly" | "All">("Weekly");
+  const [filter, setFilter] = useState<"Daily" | "Weekly" | "All">("Daily");
   const [filterCategory, setFilterCategory] = useState<string | undefined>(
     undefined
   );
@@ -86,6 +87,34 @@ export default function FoodScreen() {
     return stats;
   }, [foodLogs, filter]);
 
+  const macroStats = useMemo(() => {
+    if (filter !== "Daily") return [];
+    const stats = { protein: 0, carbs: 0, fat: 0 };
+    foodLogs.forEach((food) => {
+      stats.protein += food.protein;
+      stats.carbs += food.carbohydrate;
+      stats.fat += food.fat;
+    });
+    return [
+      { value: stats.protein, color: "#3b82f6", text: "Protein" }, // blue-500
+      { value: stats.carbs, color: "#f59e0b", text: "Carbs" }, // amber-500
+      { value: stats.fat, color: "#ef4444", text: "Fat" }, // red-500
+    ];
+  }, [foodLogs, filter]);
+
+  const dailyTotals = useMemo(() => {
+    if (filter !== "Daily") return null;
+    const totals = { protein: 0, carbs: 0, fat: 0, sugar: 0, calories: 0 };
+    foodLogs.forEach((food) => {
+      totals.protein += food.protein;
+      totals.carbs += food.carbohydrate;
+      totals.fat += food.fat;
+      totals.sugar += food.sugar;
+      totals.calories += food.caloric;
+    });
+    return totals;
+  }, [foodLogs, filter]);
+
   const maxCalories = useMemo(() => {
     return Math.max(...weeklyStats.map((s) => s.total), 1);
   }, [weeklyStats]);
@@ -105,6 +134,9 @@ export default function FoodScreen() {
       const lastDay = new Date(now.setDate(now.getDate() - now.getDay() + 7)); // Sunday
       startDate = firstDay.toISOString();
       endDate = lastDay.toISOString();
+    } else if (filter === "Daily") {
+      const date = filterDate ? new Date(filterDate) : new Date();
+      dateFilter = date.toISOString();
     } else if (filterDate) {
       dateFilter = new Date(filterDate).toISOString();
     }
@@ -206,9 +238,9 @@ export default function FoodScreen() {
     <ScreenWrapper title="Food">
       <View className="flex-1">
         <ScrollView className="flex-1 p-4">
-          <View className="flex-row justify-between items-center mb-4">
-            <ThemedText type="subtitle">Recent Food Logs</ThemedText>
-            <View className="flex-row gap-2">
+          <View className="mb-4">
+            <View className="flex-row items-center justify-between mb-4">
+              <ThemedText type="subtitle">Recent Food Logs</ThemedText>
               <TouchableOpacity
                 onPress={() => setIsFilterVisible(true)}
                 className={`p-2 rounded-lg ${
@@ -219,28 +251,94 @@ export default function FoodScreen() {
               >
                 <Ionicons name="filter" size={20} color="white" />
               </TouchableOpacity>
-              <View className="w-36">
-                <SegmentedControl
-                  options={["Weekly", "All"]}
-                  value={filter}
-                  onChange={(val) => setFilter(val as "Weekly" | "All")}
-                />
-              </View>
             </View>
+
+            <SegmentedControl
+              options={["Daily", "Weekly", "All"]}
+              value={filter}
+              onChange={(val) => setFilter(val as "Daily" | "Weekly" | "All")}
+            />
           </View>
 
+          {filter === "Daily" && dailyTotals && (
+            <View className="p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
+              <Text className="mb-4 font-bold text-white">Daily Totals</Text>
+              <View className="flex-row flex-wrap justify-between gap-4">
+                <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
+                  <Text className="text-2xl font-bold text-emerald-500">
+                    {Math.round(dailyTotals.calories)}
+                  </Text>
+                  <Text className="text-xs text-neutral-400">Calories</Text>
+                </View>
+                <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
+                  <Text className="text-2xl font-bold text-blue-500">
+                    {Math.round(dailyTotals.protein)}g
+                  </Text>
+                  <Text className="text-xs text-neutral-400">Protein</Text>
+                </View>
+                <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
+                  <Text className="text-2xl font-bold text-amber-500">
+                    {Math.round(dailyTotals.carbs)}g
+                  </Text>
+                  <Text className="text-xs text-neutral-400">Carbs</Text>
+                </View>
+                <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
+                  <Text className="text-2xl font-bold text-red-500">
+                    {Math.round(dailyTotals.fat)}g
+                  </Text>
+                  <Text className="text-xs text-neutral-400">Fat</Text>
+                </View>
+                <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
+                  <Text className="text-2xl font-bold text-pink-500">
+                    {Math.round(dailyTotals.sugar)}g
+                  </Text>
+                  <Text className="text-xs text-neutral-400">Sugar</Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {filter === "Daily" && (
+            <View className="items-center p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
+              <Text className="self-start mb-4 font-bold text-white">
+                Daily Macro Breakdown
+              </Text>
+              <PieChart
+                data={macroStats}
+                showText
+                textColor="white"
+                radius={100}
+                textSize={12}
+                labelsPosition="outward"
+              />
+              <View className="flex-row flex-wrap justify-center gap-4 mt-4">
+                {macroStats.map((stat) => (
+                  <View key={stat.text} className="flex-row items-center gap-2">
+                    <View
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: stat.color }}
+                    />
+                    <Text className="text-xs text-neutral-400">
+                      {stat.text}: {Math.round(stat.value)}g
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
           {filter === "Weekly" && (
-            <View className="bg-neutral-900 p-4 rounded-2xl mb-6 border border-neutral-800">
-              <Text className="text-white font-bold mb-4">
+            <View className="p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
+              <Text className="mb-4 font-bold text-white">
                 Weekly Calorie Breakdown
               </Text>
               <View className="gap-3">
                 {weeklyStats.map((stat) => (
                   <View key={stat.day} className="flex-row items-center">
-                    <Text className="text-neutral-400 w-8 font-medium">
+                    <Text className="w-8 font-medium text-neutral-400">
                       {stat.day}
                     </Text>
-                    <View className="flex-1 h-6 bg-neutral-800 rounded-full flex-row overflow-hidden mx-2">
+                    <View className="flex-row flex-1 h-6 mx-2 overflow-hidden rounded-full bg-neutral-800">
                       {Object.entries(stat.breakdown).map(([cat, calories]) => {
                         const width = (calories / maxCalories) * 100;
                         const color = getFoodIcon(cat).color;
@@ -255,20 +353,20 @@ export default function FoodScreen() {
                         );
                       })}
                     </View>
-                    <Text className="text-white w-10 text-right text-xs">
+                    <Text className="w-10 text-xs text-right text-white">
                       {stat.total > 0 ? stat.total : ""}
                     </Text>
                   </View>
                 ))}
               </View>
-              <View className="flex-row flex-wrap gap-4 mt-4 justify-center">
+              <View className="flex-row flex-wrap justify-center gap-4 mt-4">
                 {["Breakfast", "Lunch", "Dinner", "Snack"].map((cat) => (
                   <View key={cat} className="flex-row items-center gap-2">
                     <View
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: getFoodIcon(cat).color }}
                     />
-                    <Text className="text-neutral-400 text-xs">{cat}</Text>
+                    <Text className="text-xs text-neutral-400">{cat}</Text>
                   </View>
                 ))}
               </View>
@@ -280,9 +378,9 @@ export default function FoodScreen() {
             return (
               <View
                 key={food.id}
-                className="bg-neutral-900 p-4 rounded-2xl mb-3 flex-row justify-between items-center border border-neutral-800"
+                className="flex-row items-center justify-between p-4 mb-3 border bg-neutral-900 rounded-2xl border-neutral-800"
               >
-                <View className="mr-4 bg-neutral-800 p-3 rounded-full">
+                <View className="p-3 mr-4 rounded-full bg-neutral-800">
                   <Ionicons
                     name={icon.name as any}
                     size={24}
@@ -290,14 +388,14 @@ export default function FoodScreen() {
                   />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-white font-bold text-lg">
+                  <Text className="text-lg font-bold text-white">
                     {food.name}
                   </Text>
-                  <Text className="text-neutral-400 mt-1">
+                  <Text className="mt-1 text-neutral-400">
                     {food.caloric} kcal • P: {food.protein}g • C:{" "}
                     {food.carbohydrate}g • F: {food.fat}g
                   </Text>
-                  <Text className="text-neutral-500 text-xs mt-2">
+                  <Text className="mt-2 text-xs text-neutral-500">
                     {new Date(food.created_at).toLocaleString()} •{" "}
                     {food.category}
                   </Text>
@@ -305,13 +403,13 @@ export default function FoodScreen() {
                 <View className="flex-col gap-2 ml-2">
                   <TouchableOpacity
                     onPress={() => handleEdit(food)}
-                    className="bg-blue-500/10 p-2 rounded-full"
+                    className="p-2 rounded-full bg-blue-500/10"
                   >
                     <Ionicons name="pencil" size={16} color="#3b82f6" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => handleDelete(food.id)}
-                    className="bg-red-500/10 p-2 rounded-full"
+                    className="p-2 rounded-full bg-red-500/10"
                   >
                     <Ionicons name="trash" size={16} color="#ef4444" />
                   </TouchableOpacity>
@@ -321,7 +419,7 @@ export default function FoodScreen() {
           })}
 
           {foodLogs.length === 0 && (
-            <Text className="text-neutral-500 text-center mt-8">
+            <Text className="mt-8 text-center text-neutral-500">
               No food logs recorded yet
             </Text>
           )}
@@ -329,7 +427,7 @@ export default function FoodScreen() {
           <View className="h-20" />
         </ScrollView>
 
-        <View className="p-4 border-t border-neutral-800 bg-black">
+        <View className="p-4 bg-black border-t border-neutral-800">
           <TouchableOpacity
             onPress={() => {
               setName("");
@@ -342,9 +440,9 @@ export default function FoodScreen() {
               setEditingId(null);
               setIsFormVisible(true);
             }}
-            className="bg-emerald-600 p-3 rounded-xl items-center shadow-sm active:bg-emerald-700"
+            className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
-            <Text className="text-white font-bold text-lg">Add New Food</Text>
+            <Text className="text-lg font-bold text-white">Add New Food</Text>
           </TouchableOpacity>
         </View>
 
@@ -428,9 +526,9 @@ export default function FoodScreen() {
 
           <TouchableOpacity
             onPress={handleSubmit}
-            className="bg-emerald-600 p-3 rounded-xl items-center shadow-sm active:bg-emerald-700"
+            className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
-            <Text className="text-white font-bold text-lg">
+            <Text className="text-lg font-bold text-white">
               {editingId ? "Update Food" : "Add Food"}
             </Text>
           </TouchableOpacity>
@@ -452,7 +550,7 @@ export default function FoodScreen() {
           )}
 
           <View className="mb-6">
-            <Text className="text-neutral-400 mb-2 text-sm font-medium">
+            <Text className="mb-2 text-sm font-medium text-neutral-400">
               Category
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -486,15 +584,15 @@ export default function FoodScreen() {
                 setFilterCategory(undefined);
                 setFilterDate(undefined);
               }}
-              className="flex-1 bg-neutral-800 p-3 rounded-xl items-center"
+              className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
             >
-              <Text className="text-white font-bold">Clear All</Text>
+              <Text className="font-bold text-white">Clear All</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setIsFilterVisible(false)}
-              className="flex-1 bg-emerald-600 p-3 rounded-xl items-center"
+              className="items-center flex-1 p-3 bg-emerald-600 rounded-xl"
             >
-              <Text className="text-white font-bold">Apply Filters</Text>
+              <Text className="font-bold text-white">Apply Filters</Text>
             </TouchableOpacity>
           </View>
         </BottomSheet>

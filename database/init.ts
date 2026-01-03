@@ -2,6 +2,8 @@ import db from "./db";
 
 export const initDatabase = () => {
   try {
+    db.execSync("PRAGMA journal_mode = WAL;");
+
     // 1. Create tables if they don't exist
     // Note: If tables already exist, these statements do nothing, even if schema doesn't match.
     // We handle schema updates in the migration step below.
@@ -41,16 +43,51 @@ export const initDatabase = () => {
         waist_cm REAL,
         measured_at TEXT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS user_targets (
+        target_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        nutrition_caloric REAL,
+        nutrition_protein REAL,
+        nutrition_carbohydrate REAL,
+        nutrition_fat REAL,
+        nutrition_sugar REAL,
+        bodyweight REAL,
+        viceral_fat REAL,
+        fat_percentage REAL,
+        weekly_exercise_minutes INTEGER,
+        weekly_exercise_sessions INTEGER,
+        weekly_exercise_caloric INTEGER,
+        weekly_weight_lifting_sessions INTEGER,
+        weekly_cardio_minutes INTEGER
+      );
     `);
 
     // 2. Migration Strategy: Check for missing columns and add them safely
     migrateExercisesTable();
     migrateFoodTable();
     migrateWeightTable();
+    migrateUserTargetsTable();
 
     console.log("Database initialized successfully");
   } catch (error) {
     console.error("Error initializing database:", error);
+  }
+};
+
+const migrateUserTargetsTable = () => {
+  try {
+    const tableInfo = db.getAllSync("PRAGMA table_info(user_targets)") as {
+      name: string;
+    }[];
+    const columns = new Set(tableInfo.map((col) => col.name));
+
+    // Add 'nutrition_sugar' if missing
+    if (!columns.has("nutrition_sugar")) {
+      db.execSync("ALTER TABLE user_targets ADD COLUMN nutrition_sugar REAL");
+    }
+  } catch (error) {
+    console.error("Error migrating user_targets table:", error);
   }
 };
 
