@@ -25,7 +25,7 @@ export function ScreenWrapper({
         <View className="flex-row items-center gap-4 px-6 py-4 border-b border-white/10">
           {showBackButton && (
             <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color="white" />
+              <Ionicons name="arrow-back" size={24} color="#10b981" />
             </TouchableOpacity>
           )}
           <Text className="text-3xl font-bold text-primary">{title}</Text>

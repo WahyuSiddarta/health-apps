@@ -1,98 +1,240 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { ScreenWrapper } from "@/components/screen-wrapper";
+import { ThemedText } from "@/components/themed-text";
+import {
+  ExerciseRecord,
+  FoodRecord,
+  getExercises,
+  getFood,
+  getUserTarget,
+  getWeightLogs,
+  UserTarget,
+  WeightRecord,
+} from "@/database/operations";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { PieChart } from "react-native-gifted-charts";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function DashboardScreen() {
+  const router = useRouter();
+  const [todayFood, setTodayFood] = useState<FoodRecord[]>([]);
+  const [todayExercise, setTodayExercise] = useState<ExerciseRecord[]>([]);
+  const [latestWeight, setLatestWeight] = useState<WeightRecord | null>(null);
+  const [userTarget, setUserTarget] = useState<UserTarget | null>(null);
 
-export default function HomeScreen() {
+  const loadData = useCallback(() => {
+    const now = new Date();
+    const today = now.toISOString();
+
+    const food = getFood({ date: today });
+    setTodayFood(food);
+
+    const exercise = getExercises({ date: today });
+    setTodayExercise(exercise);
+
+    const weightLogs = getWeightLogs();
+    setLatestWeight(weightLogs.length > 0 ? weightLogs[0] : null);
+
+    const target = getUserTarget();
+    setUserTarget(target);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
+
+  const caloriesConsumed = todayFood.reduce(
+    (acc, curr) => acc + curr.caloric,
+    0
+  );
+  const caloriesBurned = todayExercise.reduce(
+    (acc, curr) => acc + curr.caloric,
+    0
+  );
+
+  const calorieTarget = userTarget?.nutrition_caloric || 2000;
+  const caloriesRemaining = calorieTarget - caloriesConsumed + caloriesBurned;
+
+  const pieData = [
+    { value: caloriesConsumed, color: "#ef4444", text: "Consumed" }, // red-500
+    {
+      value: Math.max(0, caloriesRemaining),
+      color: "#10b981",
+      text: "Remaining",
+    }, // emerald-500
+  ];
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
+    <ScreenWrapper title="Dashboard">
+      <ScrollView className="flex-1 p-4">
+        {/* Calorie Summary Card */}
+        <View className="p-4 mb-4 border bg-neutral-900 rounded-2xl border-neutral-800">
+          <ThemedText type="subtitle" className="mb-4">
+            Calories Today
+          </ThemedText>
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Text className="text-sm text-neutral-400">Remaining</Text>
+              <Text className="text-3xl font-bold text-white">
+                {Math.round(caloriesRemaining)}
+              </Text>
+              <Text className="mt-1 text-xs text-neutral-500">
+                Target: {calorieTarget}
+              </Text>
+            </View>
+            <PieChart
+              data={pieData}
+              donut
+              radius={60}
+              innerRadius={45}
+              centerLabelComponent={() => {
+                return (
+                  <View className="items-center justify-center">
+                    <Text className="text-lg font-bold text-white">
+                      {Math.round(caloriesConsumed)}
+                    </Text>
+                    <Text className="text-xs text-neutral-500">Eaten</Text>
+                  </View>
+                );
+              }}
             />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+          </View>
+          <View className="flex-row justify-between mt-6">
+            <View className="items-center">
+              <Text className="text-lg font-bold text-emerald-500">
+                {Math.round(caloriesBurned)}
+              </Text>
+              <Text className="text-xs text-neutral-400">Burned</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-lg font-bold text-red-500">
+                {Math.round(caloriesConsumed)}
+              </Text>
+              <Text className="text-xs text-neutral-400">Eaten</Text>
+            </View>
+            <View className="items-center">
+              <Text className="text-lg font-bold text-blue-500">
+                {Math.round(
+                  todayFood.reduce((acc, curr) => acc + curr.protein, 0)
+                )}
+                g
+              </Text>
+              <Text className="text-xs text-neutral-400">Protein</Text>
+            </View>
+          </View>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+        {/* Weight Card */}
+        <View className="flex-row items-center justify-between p-4 mb-4 border bg-neutral-900 rounded-2xl border-neutral-800">
+          <View>
+            <ThemedText type="subtitle" className="mb-1">
+              Current Weight
+            </ThemedText>
+            <Text className="text-3xl font-bold text-white">
+              {latestWeight ? latestWeight.bodyweight : "--"}{" "}
+              <Text className="text-lg text-neutral-500">kg</Text>
+            </Text>
+            {userTarget?.bodyweight && (
+              <Text className="mt-1 text-xs text-neutral-500">
+                Target: {userTarget.bodyweight} kg
+              </Text>
+            )}
+          </View>
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/weight")}
+            className="p-3 rounded-full bg-neutral-800"
+          >
+            <Ionicons name="chevron-forward" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Quick Actions */}
+        <ThemedText type="subtitle" className="mb-3">
+          Quick Actions
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+        <View className="flex-row gap-3 mb-6">
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/food")}
+            className="items-center flex-1 p-4 border bg-neutral-800 rounded-xl border-neutral-700"
+          >
+            <View className="p-3 mb-2 rounded-full bg-emerald-500/20">
+              <Ionicons name="fast-food" size={24} color="#10b981" />
+            </View>
+            <Text className="font-medium text-white">Add Food</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/exercise")}
+            className="items-center flex-1 p-4 border bg-neutral-800 rounded-xl border-neutral-700"
+          >
+            <View className="p-3 mb-2 rounded-full bg-blue-500/20">
+              <Ionicons name="bicycle" size={24} color="#3b82f6" />
+            </View>
+            <Text className="font-medium text-white">Add Exercise</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/weight")}
+            className="items-center flex-1 p-4 border bg-neutral-800 rounded-xl border-neutral-700"
+          >
+            <View className="p-3 mb-2 rounded-full bg-orange-500/20">
+              <Ionicons name="scale" size={24} color="#f97316" />
+            </View>
+            <Text className="font-medium text-white">Log Weight</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Recent Activity */}
+        <ThemedText type="subtitle" className="mb-3">
+          Recent Activity
         </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {todayFood.length === 0 && todayExercise.length === 0 ? (
+          <Text className="py-4 text-center text-neutral-500">
+            No activity today
+          </Text>
+        ) : (
+          <View className="gap-3">
+            {todayFood.slice(0, 3).map((food) => (
+              <View
+                key={`food-${food.id}`}
+                className="flex-row items-center p-3 border bg-neutral-900 rounded-xl border-neutral-800"
+              >
+                <View className="p-2 mr-3 rounded-full bg-neutral-800">
+                  <Ionicons name="fast-food" size={16} color="#a3a3a3" />
+                </View>
+                <View className="flex-1">
+                  <Text className="font-medium text-white">{food.name}</Text>
+                  <Text className="text-xs text-neutral-500">
+                    {food.category}
+                  </Text>
+                </View>
+                <Text className="font-medium text-red-400">
+                  +{Math.round(food.caloric)} kcal
+                </Text>
+              </View>
+            ))}
+            {todayExercise.slice(0, 3).map((ex) => (
+              <View
+                key={`ex-${ex.id}`}
+                className="flex-row items-center p-3 border bg-neutral-900 rounded-xl border-neutral-800"
+              >
+                <View className="p-2 mr-3 rounded-full bg-neutral-800">
+                  <Ionicons name="bicycle" size={16} color="#a3a3a3" />
+                </View>
+                <View className="flex-1">
+                  <Text className="font-medium text-white">{ex.name}</Text>
+                  <Text className="text-xs text-neutral-500">{ex.type}</Text>
+                </View>
+                <Text className="font-medium text-emerald-400">
+                  -{Math.round(ex.caloric)} kcal
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+        <View className="h-20" />
+      </ScrollView>
+    </ScreenWrapper>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});

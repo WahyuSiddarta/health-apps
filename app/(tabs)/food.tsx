@@ -9,7 +9,9 @@ import {
   deleteFood,
   FoodRecord,
   getFood,
+  getUserTarget,
   updateFood,
+  UserTarget,
 } from "@/database/operations";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
@@ -35,6 +37,7 @@ export default function FoodScreen() {
     undefined
   );
   const [filterDate, setFilterDate] = useState<string | undefined>(undefined);
+  const [userTarget, setUserTarget] = useState<UserTarget | null>(null);
 
   useEffect(() => {
     const p = parseFloat(protein) || 0;
@@ -153,6 +156,8 @@ export default function FoodScreen() {
   useFocusEffect(
     useCallback(() => {
       loadFoodLogs();
+      const target = getUserTarget();
+      setUserTarget(target);
     }, [loadFoodLogs])
   );
 
@@ -265,32 +270,114 @@ export default function FoodScreen() {
               <Text className="mb-4 font-bold text-white">Daily Totals</Text>
               <View className="flex-row flex-wrap justify-between gap-4">
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
-                  <Text className="text-2xl font-bold text-emerald-500">
+                  <Text
+                    className={`text-2xl font-bold ${
+                      userTarget?.nutrition_caloric &&
+                      userTarget.nutrition_caloric > 0 &&
+                      dailyTotals.calories > userTarget.nutrition_caloric
+                        ? "text-red-500"
+                        : "text-emerald-500"
+                    }`}
+                  >
                     {Math.round(dailyTotals.calories)}
+                    {userTarget?.nutrition_caloric &&
+                    userTarget.nutrition_caloric > 0 ? (
+                      <Text className="text-sm text-neutral-400">
+                        {" "}
+                        / {userTarget.nutrition_caloric}
+                      </Text>
+                    ) : null}
                   </Text>
                   <Text className="text-xs text-neutral-400">Calories</Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
-                  <Text className="text-2xl font-bold text-blue-500">
+                  <Text
+                    className={`text-2xl font-bold ${
+                      userTarget?.nutrition_protein &&
+                      userTarget.nutrition_protein > 0 &&
+                      Math.abs(
+                        dailyTotals.protein - userTarget.nutrition_protein
+                      ) <=
+                        userTarget.nutrition_protein * 0.1
+                        ? "text-emerald-500"
+                        : "text-blue-500"
+                    }`}
+                  >
                     {Math.round(dailyTotals.protein)}g
+                    {userTarget?.nutrition_protein &&
+                    userTarget.nutrition_protein > 0 ? (
+                      <Text className="text-sm text-neutral-400">
+                        {" "}
+                        / {userTarget.nutrition_protein}g
+                      </Text>
+                    ) : null}
                   </Text>
                   <Text className="text-xs text-neutral-400">Protein</Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
-                  <Text className="text-2xl font-bold text-amber-500">
+                  <Text
+                    className={`text-2xl font-bold ${
+                      userTarget?.nutrition_carbohydrate &&
+                      userTarget.nutrition_carbohydrate > 0 &&
+                      Math.abs(
+                        dailyTotals.carbs - userTarget.nutrition_carbohydrate
+                      ) <=
+                        userTarget.nutrition_carbohydrate * 0.1
+                        ? "text-emerald-500"
+                        : "text-amber-500"
+                    }`}
+                  >
                     {Math.round(dailyTotals.carbs)}g
+                    {userTarget?.nutrition_carbohydrate &&
+                    userTarget.nutrition_carbohydrate > 0 ? (
+                      <Text className="text-sm text-neutral-400">
+                        {" "}
+                        / {userTarget.nutrition_carbohydrate}g
+                      </Text>
+                    ) : null}
                   </Text>
                   <Text className="text-xs text-neutral-400">Carbs</Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
-                  <Text className="text-2xl font-bold text-red-500">
+                  <Text
+                    className={`text-2xl font-bold ${
+                      userTarget?.nutrition_fat &&
+                      userTarget.nutrition_fat > 0 &&
+                      Math.abs(dailyTotals.fat - userTarget.nutrition_fat) <=
+                        userTarget.nutrition_fat * 0.1
+                        ? "text-emerald-500"
+                        : "text-red-500"
+                    }`}
+                  >
                     {Math.round(dailyTotals.fat)}g
+                    {userTarget?.nutrition_fat &&
+                    userTarget.nutrition_fat > 0 ? (
+                      <Text className="text-sm text-neutral-400">
+                        {" "}
+                        / {userTarget.nutrition_fat}g
+                      </Text>
+                    ) : null}
                   </Text>
                   <Text className="text-xs text-neutral-400">Fat</Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
-                  <Text className="text-2xl font-bold text-pink-500">
+                  <Text
+                    className={`text-2xl font-bold ${
+                      userTarget?.nutrition_sugar &&
+                      userTarget.nutrition_sugar > 0 &&
+                      dailyTotals.sugar > userTarget.nutrition_sugar
+                        ? "text-red-500"
+                        : "text-pink-500"
+                    }`}
+                  >
                     {Math.round(dailyTotals.sugar)}g
+                    {userTarget?.nutrition_sugar &&
+                    userTarget.nutrition_sugar > 0 ? (
+                      <Text className="text-sm text-neutral-400">
+                        {" "}
+                        / {userTarget.nutrition_sugar}g
+                      </Text>
+                    ) : null}
                   </Text>
                   <Text className="text-xs text-neutral-400">Sugar</Text>
                 </View>
@@ -353,9 +440,31 @@ export default function FoodScreen() {
                         );
                       })}
                     </View>
-                    <Text className="w-10 text-xs text-right text-white">
-                      {stat.total > 0 ? stat.total : ""}
-                    </Text>
+                    <View className="items-end w-20">
+                      <Text className="text-xs text-white">
+                        {stat.total > 0 ? Math.round(stat.total) : "-"}
+                      </Text>
+                      {userTarget?.nutrition_caloric &&
+                      userTarget.nutrition_caloric > 0 &&
+                      stat.total > 0 ? (
+                        <Text
+                          className={`text-[10px] ${
+                            stat.total > userTarget.nutrition_caloric
+                              ? "text-red-500"
+                              : "text-emerald-500"
+                          }`}
+                        >
+                          {stat.total > userTarget.nutrition_caloric
+                            ? "Over "
+                            : "Left "}
+                          {Math.abs(
+                            Math.round(
+                              stat.total - userTarget.nutrition_caloric
+                            )
+                          )}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
                 ))}
               </View>

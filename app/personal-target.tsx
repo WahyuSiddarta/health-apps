@@ -326,7 +326,7 @@ export default function PersonalTargetScreen() {
           onPress={handleSave}
           className="items-center justify-center p-4 rounded-xl bg-primary"
         >
-          <Text className="text-lg font-bold text-black">Save Changes</Text>
+          <Text className="text-lg font-bold text-white">Save Changes</Text>
         </TouchableOpacity>
       </View>
     </ScreenWrapper>
