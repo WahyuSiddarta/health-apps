@@ -47,6 +47,21 @@ export default function SettingsScreen() {
 
         <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
           <TouchableOpacity
+            onPress={() => router.push("/about")}
+            className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+          >
+            <View className="flex-row items-center gap-3">
+              <View className="items-center justify-center w-8 h-8 rounded-full bg-blue-500/20">
+                <Ionicons name="information-circle" size={18} color="#3b82f6" />
+              </View>
+              <Text className="font-medium text-white">About Us</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#525252" />
+          </TouchableOpacity>
+        </View>
+
+        <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+          <TouchableOpacity
             onPress={handleResetData}
             className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
           >

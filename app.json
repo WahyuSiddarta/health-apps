@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "health-tracker",
-    "slug": "health-tracker",
+    "name": "Bugarin",
+    "slug": "bugarin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo_new.svg",
-    "scheme": "healthtracker",
+    "scheme": "bugarin",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
@@ -15,12 +15,12 @@
       "adaptiveIcon": {
         "backgroundColor": "#10b981",
         "foregroundImage": "./assets/images/adaptive_icon_foreground.svg",
-        "backgroundImage": "./assets/images/android-icon-background.png",
+        "backgroundImage": "./assets/images/adaptive_icon_foreground.svg",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.healthtracker"
+      "package": "com.anonymous.bugarin"
     },
     "web": {
       "output": "static",
