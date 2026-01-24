@@ -1,3 +1,4 @@
+import { addBreadcrumb, captureDatabaseError } from "@/utils/error-handler";
 import db from "./db";
 
 // --- Exercises ---
@@ -22,6 +23,10 @@ export const addExercise = (
   type: string,
 ) => {
   try {
+    addBreadcrumb("Adding exercise record", {
+      category: "data",
+      data: { name, intensity, type },
+    });
     const statement = db.prepareSync(
       "INSERT INTO exercises (name, record_at, minute, caloric, intensity, type) VALUES ($name, $recordAt, $minute, $caloric, $intensity, $type)",
     );
@@ -35,7 +40,14 @@ export const addExercise = (
     });
     return result.lastInsertRowId;
   } catch (error) {
-    console.error("Error adding exercise:", error);
+    captureDatabaseError(error as Error, "addExercise", {
+      name,
+      recordAt,
+      minute,
+      caloric,
+      intensity,
+      type,
+    });
     throw error;
   }
 };
@@ -529,12 +541,13 @@ export const updatePersonalExerciseTarget = (
 
 export const resetAllData = () => {
   try {
+    addBreadcrumb("Resetting all database data", { category: "data" });
     db.execSync("DELETE FROM exercises");
     db.execSync("DELETE FROM food");
     db.execSync("DELETE FROM weight");
     db.execSync("DELETE FROM user_targets");
   } catch (error) {
-    console.error("Error resetting all data:", error);
+    captureDatabaseError(error as Error, "resetAllData", {});
     throw error;
   }
 };
