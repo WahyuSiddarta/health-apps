@@ -4,12 +4,14 @@ interface InputFieldProps extends TextInputProps {
   label: string;
   className?: string;
   useThousandSeparator?: boolean;
+  required?: boolean;
 }
 
 export function InputField({
   label,
   className,
   useThousandSeparator,
+  required,
   value,
   onChangeText,
   ...props
@@ -36,7 +38,15 @@ export function InputField({
 
   return (
     <View className={className}>
-      <Text className="text-neutral-400 mb-2 text-sm font-medium">{label}</Text>
+      <Text className="text-neutral-400 mb-2 text-sm font-medium">
+        {label}
+        {required !== undefined &&
+          (required ? (
+            <Text className="text-red-500"> *</Text>
+          ) : (
+            <Text className="text-neutral-500 text-xs"> (optional)</Text>
+          ))}
+      </Text>
       <TextInput
         className="bg-neutral-800 text-white px-3 py-2 rounded-xl border border-neutral-700"
         placeholderTextColor="#737373"

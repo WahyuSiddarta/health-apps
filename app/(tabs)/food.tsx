@@ -34,7 +34,7 @@ export default function FoodScreen() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [filter, setFilter] = useState<"Daily" | "Weekly" | "All">("Daily");
   const [filterCategory, setFilterCategory] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [filterDate, setFilterDate] = useState<string | undefined>(undefined);
   const [userTarget, setUserTarget] = useState<UserTarget | null>(null);
@@ -131,8 +131,8 @@ export default function FoodScreen() {
       const now = new Date();
       const firstDay = new Date(
         now.setDate(
-          now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)
-        )
+          now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1),
+        ),
       ); // Monday
       const lastDay = new Date(now.setDate(now.getDate() - now.getDay() + 7)); // Sunday
       startDate = firstDay.toISOString();
@@ -158,7 +158,7 @@ export default function FoodScreen() {
       loadFoodLogs();
       const target = getUserTarget();
       setUserTarget(target);
-    }, [loadFoodLogs])
+    }, [loadFoodLogs]),
   );
 
   const handleSubmit = () => {
@@ -181,7 +181,7 @@ export default function FoodScreen() {
           carbs ? parseFloat(carbs) : 0,
           parseFloat(calories) || 0,
           sugar ? parseFloat(sugar) : 0,
-          name
+          name,
         );
         showToast("Food updated successfully", "success");
       } else {
@@ -195,7 +195,7 @@ export default function FoodScreen() {
           carbs ? parseFloat(carbs) : 0,
           parseFloat(calories) || 0,
           sugar ? parseFloat(sugar) : 0,
-          name
+          name,
         );
         showToast("Food added successfully", "success");
       }
@@ -212,7 +212,7 @@ export default function FoodScreen() {
     } catch (error) {
       showToast(
         editingId ? "Failed to update food" : "Failed to add food",
-        "error"
+        "error",
       );
     }
   };
@@ -296,7 +296,7 @@ export default function FoodScreen() {
                       userTarget?.nutrition_protein &&
                       userTarget.nutrition_protein > 0 &&
                       Math.abs(
-                        dailyTotals.protein - userTarget.nutrition_protein
+                        dailyTotals.protein - userTarget.nutrition_protein,
                       ) <=
                         userTarget.nutrition_protein * 0.1
                         ? "text-emerald-500"
@@ -320,7 +320,7 @@ export default function FoodScreen() {
                       userTarget?.nutrition_carbohydrate &&
                       userTarget.nutrition_carbohydrate > 0 &&
                       Math.abs(
-                        dailyTotals.carbs - userTarget.nutrition_carbohydrate
+                        dailyTotals.carbs - userTarget.nutrition_carbohydrate,
                       ) <=
                         userTarget.nutrition_carbohydrate * 0.1
                         ? "text-emerald-500"
@@ -459,8 +459,8 @@ export default function FoodScreen() {
                             : "Left "}
                           {Math.abs(
                             Math.round(
-                              stat.total - userTarget.nutrition_caloric
-                            )
+                              stat.total - userTarget.nutrition_caloric,
+                            ),
                           )}
                         </Text>
                       ) : null}
@@ -566,6 +566,7 @@ export default function FoodScreen() {
             onChangeText={setName}
             placeholder="e.g. Oatmeal"
             className="mb-4"
+            required
           />
 
           <InputField
@@ -588,6 +589,7 @@ export default function FoodScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 5"
+                required={false}
               />
             </View>
             <View className="flex-1">
@@ -598,6 +600,7 @@ export default function FoodScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 27"
+                required={false}
               />
             </View>
           </View>
@@ -611,6 +614,7 @@ export default function FoodScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 3"
+                required={false}
               />
             </View>
             <View className="flex-1">
@@ -621,6 +625,7 @@ export default function FoodScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 1"
+                required={false}
               />
             </View>
           </View>

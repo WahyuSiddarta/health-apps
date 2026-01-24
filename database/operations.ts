@@ -19,11 +19,11 @@ export const addExercise = (
   minute: number | null,
   caloric: number,
   intensity: string,
-  type: string
+  type: string,
 ) => {
   try {
     const statement = db.prepareSync(
-      "INSERT INTO exercises (name, record_at, minute, caloric, intensity, type) VALUES ($name, $recordAt, $minute, $caloric, $intensity, $type)"
+      "INSERT INTO exercises (name, record_at, minute, caloric, intensity, type) VALUES ($name, $recordAt, $minute, $caloric, $intensity, $type)",
     );
     const result = statement.executeSync({
       $name: name,
@@ -98,11 +98,11 @@ export const updateExercise = (
   minute: number | null,
   caloric: number,
   intensity: string,
-  type: string
+  type: string,
 ) => {
   try {
     const statement = db.prepareSync(
-      "UPDATE exercises SET name = $name, minute = $minute, caloric = $caloric, intensity = $intensity, type = $type WHERE id = $id"
+      "UPDATE exercises SET name = $name, minute = $minute, caloric = $caloric, intensity = $intensity, type = $type WHERE id = $id",
     );
     statement.executeSync({
       $id: id,
@@ -144,11 +144,11 @@ export const addFood = (
   carbohydrate: number,
   caloric: number,
   sugar: number,
-  name: string
+  name: string,
 ) => {
   try {
     const statement = db.prepareSync(
-      "INSERT INTO food (user_id, food_id, category, created_at, fat, protein, carbohydrate, caloric, sugar, name) VALUES ($userId, $foodId, $category, $createdAt, $fat, $protein, $carbohydrate, $caloric, $sugar, $name)"
+      "INSERT INTO food (user_id, food_id, category, created_at, fat, protein, carbohydrate, caloric, sugar, name) VALUES ($userId, $foodId, $category, $createdAt, $fat, $protein, $carbohydrate, $caloric, $sugar, $name)",
     );
     const result = statement.executeSync({
       $userId: userId,
@@ -226,11 +226,11 @@ export const updateFood = (
   carbohydrate: number,
   caloric: number,
   sugar: number,
-  name: string
+  name: string,
 ) => {
   try {
     const statement = db.prepareSync(
-      "UPDATE food SET user_id = $userId, food_id = $foodId, category = $category, created_at = $createdAt, fat = $fat, protein = $protein, carbohydrate = $carbohydrate, caloric = $caloric, sugar = $sugar, name = $name WHERE id = $id"
+      "UPDATE food SET user_id = $userId, food_id = $foodId, category = $category, created_at = $createdAt, fat = $fat, protein = $protein, carbohydrate = $carbohydrate, caloric = $caloric, sugar = $sugar, name = $name WHERE id = $id",
     );
     statement.executeSync({
       $id: id,
@@ -271,11 +271,11 @@ export const addWeight = (
   fatPercentage: number | null,
   nickCm: number | null,
   waistCm: number | null,
-  measuredAt: string
+  measuredAt: string,
 ) => {
   try {
     const statement = db.prepareSync(
-      "INSERT INTO weight (user_id, bodyweight, viceral_fat, fat_percentage, nick_cm, waist_cm, measured_at) VALUES ($userId, $bodyweight, $viceralFat, $fatPercentage, $nickCm, $waistCm, $measuredAt)"
+      "INSERT INTO weight (user_id, bodyweight, viceral_fat, fat_percentage, nick_cm, waist_cm, measured_at) VALUES ($userId, $bodyweight, $viceralFat, $fatPercentage, $nickCm, $waistCm, $measuredAt)",
     );
     const result = statement.executeSync({
       $userId: userId,
@@ -331,11 +331,11 @@ export const updateWeight = (
   fatPercentage: number | null,
   nickCm: number | null,
   waistCm: number | null,
-  measuredAt: string
+  measuredAt: string,
 ) => {
   try {
     const statement = db.prepareSync(
-      "UPDATE weight SET user_id = $userId, bodyweight = $bodyweight, viceral_fat = $viceralFat, fat_percentage = $fatPercentage, nick_cm = $nickCm, waist_cm = $waistCm, measured_at = $measuredAt WHERE id = $id"
+      "UPDATE weight SET user_id = $userId, bodyweight = $bodyweight, viceral_fat = $viceralFat, fat_percentage = $fatPercentage, nick_cm = $nickCm, waist_cm = $waistCm, measured_at = $measuredAt WHERE id = $id",
     );
     statement.executeSync({
       $id: id,
@@ -387,7 +387,7 @@ export const getUserTarget = (userId: number = 1): UserTarget | null => {
   let statement;
   try {
     statement = db.prepareSync(
-      "SELECT * FROM user_targets WHERE user_id = $userId"
+      "SELECT * FROM user_targets WHERE user_id = $userId",
     );
     const result = statement.executeSync({ $userId: userId });
     const row = result.getFirstSync();
@@ -428,7 +428,7 @@ export const updatePersonalNutritionTarget = (
   protein: number,
   carbs: number,
   fat: number,
-  sugar: number
+  sugar: number,
 ) => {
   let statement;
   try {
@@ -463,7 +463,7 @@ export const updatePersonalBodyMeasurementTarget = (
   userId: number,
   bodyweight: number,
   viceralFat: number,
-  fatPercentage: number
+  fatPercentage: number,
 ) => {
   let statement;
   try {
@@ -496,7 +496,7 @@ export const updatePersonalExerciseTarget = (
   sessions: number,
   caloric: number,
   weightLiftingSessions: number,
-  cardioMinutes: number
+  cardioMinutes: number,
 ) => {
   let statement;
   try {
@@ -524,5 +524,17 @@ export const updatePersonalExerciseTarget = (
     if (statement) {
       statement.finalizeSync();
     }
+  }
+};
+
+export const resetAllData = () => {
+  try {
+    db.execSync("DELETE FROM exercises");
+    db.execSync("DELETE FROM food");
+    db.execSync("DELETE FROM weight");
+    db.execSync("DELETE FROM user_targets");
+  } catch (error) {
+    console.error("Error resetting all data:", error);
+    throw error;
   }
 };

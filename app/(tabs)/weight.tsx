@@ -118,8 +118,8 @@ export default function WeightScreen() {
       const now = new Date();
       const firstDay = new Date(
         now.setDate(
-          now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)
-        )
+          now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1),
+        ),
       ); // Monday
       const lastDay = new Date(now.setDate(now.getDate() - now.getDay() + 7)); // Sunday
       startDate = firstDay.toISOString();
@@ -139,7 +139,7 @@ export default function WeightScreen() {
   useFocusEffect(
     useCallback(() => {
       loadWeightLogs();
-    }, [loadWeightLogs])
+    }, [loadWeightLogs]),
   );
 
   const handleSubmit = () => {
@@ -159,7 +159,7 @@ export default function WeightScreen() {
           neckCm ? parseFloat(neckCm) : null,
           waistCm ? parseFloat(waistCm) : null,
           weightLogs.find((w) => w.id === editingId)?.measured_at ||
-            new Date().toISOString()
+            new Date().toISOString(),
         );
         showToast("Weight updated successfully", "success");
       } else {
@@ -170,7 +170,7 @@ export default function WeightScreen() {
           fatPercentage ? parseFloat(fatPercentage) : null,
           neckCm ? parseFloat(neckCm) : null,
           waistCm ? parseFloat(waistCm) : null,
-          new Date().toISOString()
+          new Date().toISOString(),
         );
         showToast("Weight added successfully", "success");
       }
@@ -185,7 +185,7 @@ export default function WeightScreen() {
     } catch (error) {
       showToast(
         editingId ? "Failed to update weight" : "Failed to add weight",
-        "error"
+        "error",
       );
     }
   };
@@ -366,6 +366,7 @@ export default function WeightScreen() {
             useThousandSeparator
             placeholder="e.g. 70.5"
             className="mb-4"
+            required
           />
 
           <View className="flex-row gap-4 mb-4">
@@ -377,6 +378,7 @@ export default function WeightScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 15"
+                required={false}
               />
             </View>
             <View className="flex-1">
@@ -387,6 +389,7 @@ export default function WeightScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 5"
+                required={false}
               />
             </View>
           </View>
@@ -400,6 +403,7 @@ export default function WeightScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 38"
+                required={false}
               />
             </View>
             <View className="flex-1">
@@ -410,6 +414,7 @@ export default function WeightScreen() {
                 keyboardType="numeric"
                 useThousandSeparator
                 placeholder="e.g. 85"
+                required={false}
               />
             </View>
           </View>
