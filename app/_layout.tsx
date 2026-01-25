@@ -1,3 +1,4 @@
+import { CopilotContextProvider } from "@/context/copilot-context";
 import { ToastProvider } from "@/context/toast-context";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
@@ -38,20 +39,22 @@ export default Sentry.wrap(function RootLayout() {
 
   return (
     <ToastProvider>
-      <ThemeProvider value={DarkTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="personal-target"
-            options={{ headerShown: false, presentation: "card" }}
-          />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: "modal", title: "Modal" }}
-          />
-        </Stack>
-        <StatusBar style="light" />
-      </ThemeProvider>
+      <CopilotContextProvider>
+        <ThemeProvider value={DarkTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="personal-target"
+              options={{ headerShown: false, presentation: "card" }}
+            />
+            <Stack.Screen
+              name="modal"
+              options={{ presentation: "modal", title: "Modal" }}
+            />
+          </Stack>
+          <StatusBar style="light" />
+        </ThemeProvider>
+      </CopilotContextProvider>
     </ToastProvider>
   );
 });

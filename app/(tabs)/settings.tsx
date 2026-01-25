@@ -1,25 +1,33 @@
 import { ScreenWrapper } from "@/components/screen-wrapper";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { resetAllData } from "@/database/operations";
+import { useCopilotTutorial } from "@/hooks/use-copilot-tutorial";
 import {
   addBreadcrumb,
   captureException,
   captureMessage,
 } from "@/utils/error-handler";
 import { Ionicons } from "@expo/vector-icons";
-import * as Sentry from "@sentry/react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { startTutorial, resetTutorial } = useCopilotTutorial();
   const [isResetVisible, setIsResetVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [tutorialReset, setTutorialReset] = useState(false);
 
   const handleResetData = () => {
     setIsResetVisible(true);
   };
+
+  const handleResetTutorial = useCallback(async () => {
+    await resetTutorial();
+    setTutorialReset(true);
+    setTimeout(() => setTutorialReset(false), 2000);
+  }, [resetTutorial]);
 
   const handleConfirmReset = () => {
     setIsDeleting(true);
@@ -43,6 +51,47 @@ export default function SettingsScreen() {
       setIsDeleting(false);
       console.error("Failed to reset data:", error);
     }
+    {
+      tutorialReset && (
+        <View className="p-3 mb-4 rounded-lg bg-green-500/20 border border-green-500/50">
+          <Text className="text-sm font-medium text-green-400">
+            Tutorial progress has been reset.
+          </Text>
+        </View>
+      );
+    }
+
+    {
+      /* Tutorial Section */
+    }
+    <View className="mb-4 overflow-hidden bg-neutral-900 rounded-xl">
+      <TouchableOpacity
+        onPress={startTutorial}
+        className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+      >
+        <View className="flex-row items-center gap-3">
+          <View className="items-center justify-center w-8 h-8 rounded-full bg-blue-500/20">
+            <Ionicons name="play-circle" size={18} color="#3b82f6" />
+          </View>
+          <Text className="font-medium text-white">Start Tutorial</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#525252" />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={handleResetTutorial}
+        className="flex-row items-center justify-between p-4 bg-neutral-900"
+      >
+        <View className="flex-row items-center gap-3">
+          <View className="items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20">
+            <Ionicons name="refresh" size={18} color="#eab308" />
+          </View>
+          <Text className="font-medium text-yellow-500">
+            Reset Tutorial Progress
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#525252" />
+      </TouchableOpacity>
+    </View>;
   };
 
   return (
@@ -78,7 +127,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+        {/* <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
           <TouchableOpacity
             onPress={() => {
               addBreadcrumb("Testing Sentry error capture", {
@@ -105,7 +154,7 @@ export default function SettingsScreen() {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#525252" />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
           <TouchableOpacity
