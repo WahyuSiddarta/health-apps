@@ -20,7 +20,6 @@ import { PieChart } from "react-native-gifted-charts";
 
 // Create walkthroughable components for CopilotStep
 const WalkthroughableView = walkthroughable(View);
-const WalkthroughableTouchableOpacity = walkthroughable(TouchableOpacity);
 
 export default function DashboardScreen() {
   const router = useRouter();
