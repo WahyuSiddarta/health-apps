@@ -7,7 +7,7 @@ export default function AboutScreen() {
   const router = useRouter();
 
   return (
-    <ScreenWrapper title="About Bugarin">
+    <ScreenWrapper title="About Bugarin" showBackButton>
       <ScrollView className="flex-1 p-4">
         {/* App Icon and Name */}
         <View className="items-center mb-8">

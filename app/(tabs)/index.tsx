@@ -78,13 +78,12 @@ export default function DashboardScreen() {
     <ScreenWrapper title="Dashboard">
       <ScrollView ref={scrollViewRef} className="flex-1 p-4">
         {/* Dashboard Header */}
-        <View className="flex-row items-center justify-between mb-4">
-          <ThemedText type="title">Dashboard</ThemedText>
-          <View className="flex-row gap-2">
+        <View className="flex-row items-center justify-end mb-4">
+          <View className="flex-row justify-end gap-2">
             {/* DEV ONLY: Tutorial Test Button - Comment out for production */}
             <TouchableOpacity
               onPress={() => startTutorial()}
-              className="px-3 py-2 bg-blue-600 rounded-lg"
+              className="px-3 py-2 ml-auto bg-blue-600 rounded-lg"
             >
               <Text className="text-xs font-medium text-white">
                 Start Tutorial

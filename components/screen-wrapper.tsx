@@ -22,7 +22,7 @@ export function ScreenWrapper({
       className="flex-1"
     >
       <SafeAreaView className="flex-1" edges={["top"]}>
-        <View className="flex-row items-center gap-4 px-6 py-4 border-b border-white/10">
+        <View className="flex-row items-center gap-4 px-6 pb-4 border-b border-white/10">
           {showBackButton && (
             <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="arrow-back" size={24} color="#10b981" />
@@ -30,7 +30,7 @@ export function ScreenWrapper({
           )}
           <Text className="text-3xl font-bold text-primary">{title}</Text>
         </View>
-        <View className="flex-1">{children}</View>
+        {children ? <View className="flex-1">{children}</View> : null}
       </SafeAreaView>
     </LinearGradient>
   );

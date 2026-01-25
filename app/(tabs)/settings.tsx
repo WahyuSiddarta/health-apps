@@ -9,7 +9,8 @@ import {
 } from "@/utils/error-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function SettingsScreen() {
@@ -18,16 +19,15 @@ export default function SettingsScreen() {
   const [isResetVisible, setIsResetVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [tutorialReset, setTutorialReset] = useState(false);
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
 
   const handleResetData = () => {
     setIsResetVisible(true);
   };
-
-  const handleResetTutorial = useCallback(async () => {
-    await resetTutorial();
-    setTutorialReset(true);
-    setTimeout(() => setTutorialReset(false), 2000);
-  }, [resetTutorial]);
 
   const handleConfirmReset = () => {
     setIsDeleting(true);
@@ -36,6 +36,8 @@ export default function SettingsScreen() {
     });
     try {
       resetAllData();
+      resetTutorial();
+      startTutorial();
       captureMessage("All data reset successfully", {
         level: "info",
         category: "data-operation",
@@ -51,124 +53,91 @@ export default function SettingsScreen() {
       setIsDeleting(false);
       console.error("Failed to reset data:", error);
     }
-    {
-      tutorialReset && (
-        <View className="p-3 mb-4 border rounded-lg bg-green-500/20 border-green-500/50">
-          <Text className="text-sm font-medium text-green-400">
-            Tutorial progress has been reset.
-          </Text>
-        </View>
-      );
-    }
-
-    {
-      /* Tutorial Section */
-    }
-    <View className="mb-4 overflow-hidden bg-neutral-900 rounded-xl">
-      <TouchableOpacity
-        onPress={() => startTutorial()}
-        className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
-      >
-        <View className="flex-row items-center gap-3">
-          <View className="items-center justify-center w-8 h-8 rounded-full bg-blue-500/20">
-            <Ionicons name="play-circle" size={18} color="#3b82f6" />
-          </View>
-          <Text className="font-medium text-white">Start Tutorial</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color="#525252" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={handleResetTutorial}
-        className="flex-row items-center justify-between p-4 bg-neutral-900"
-      >
-        <View className="flex-row items-center gap-3">
-          <View className="items-center justify-center w-8 h-8 rounded-full bg-yellow-500/20">
-            <Ionicons name="refresh" size={18} color="#eab308" />
-          </View>
-          <Text className="font-medium text-yellow-500">
-            Reset Tutorial Progress
-          </Text>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color="#525252" />
-      </TouchableOpacity>
-    </View>;
   };
 
   return (
-    <ScreenWrapper title="Settings">
+    <ScreenWrapper title={t("settings")}>
       <View className="flex-1 p-4">
-        <View className="overflow-hidden bg-neutral-900 rounded-xl">
-          <TouchableOpacity
-            onPress={() => router.push("/personal-target")}
-            className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
-          >
-            <View className="flex-row items-center gap-3">
-              <View className="items-center justify-center w-8 h-8 rounded-full bg-emerald-500/20">
-                <Ionicons name="locate" size={18} color="#10b981" />
-              </View>
-              <Text className="font-medium text-white">Personal Targets</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#525252" />
-          </TouchableOpacity>
-        </View>
-
-        <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
-          <TouchableOpacity
-            onPress={() => router.push("/about")}
-            className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
-          >
+        <View className="mb-4 overflow-hidden bg-neutral-900 rounded-xl">
+          <View className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800">
             <View className="flex-row items-center gap-3">
               <View className="items-center justify-center w-8 h-8 rounded-full bg-blue-500/20">
-                <Ionicons name="information-circle" size={18} color="#3b82f6" />
+                <Ionicons name="language" size={18} color="#3b82f6" />
               </View>
-              <Text className="font-medium text-white">About Us</Text>
+              <Text className="font-medium text-white">{t("language")}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#525252" />
-          </TouchableOpacity>
+            <View className="flex-row gap-2">
+              <TouchableOpacity onPress={() => changeLanguage("en")}>
+                <Text
+                  className={`font-medium ${
+                    i18n.language === "en" ? "text-blue-500" : "text-white"
+                  }`}
+                >
+                  EN
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => changeLanguage("id")}>
+                <Text
+                  className={`font-medium ${
+                    i18n.language === "id" ? "text-blue-500" : "text-white"
+                  }`}
+                >
+                  ID
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
-        {/* <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
-          <TouchableOpacity
-            onPress={() => {
-              addBreadcrumb("Testing Sentry error capture", {
-                category: "user-action",
-              });
-              try {
-                throw new Error("Test error from Bugarin Health Tracker");
-              } catch (error) {
-                Sentry.captureException(error);
-                captureMessage("Sentry test error captured successfully", {
-                  level: "info",
-                });
-              }
-            }}
-            className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
-          >
-            <View className="flex-row items-center gap-3">
-              <View className="items-center justify-center w-8 h-8 rounded-full bg-red-500/20">
-                <Ionicons name="bug" size={18} color="#ef4444" />
+        <View className="flex-1">
+          <View className="overflow-hidden bg-neutral-900 rounded-xl">
+            <TouchableOpacity
+              onPress={() => router.push("/personal-target")}
+              className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+            >
+              <View className="flex-row items-center gap-3">
+                <View className="items-center justify-center w-8 h-8 rounded-full bg-emerald-500/20">
+                  <Ionicons name="locate" size={18} color="#10b981" />
+                </View>
+                <Text className="font-medium text-white">Personal Targets</Text>
               </View>
-              <Text className="font-medium text-red-500">
-                Test Sentry Error
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#525252" />
-          </TouchableOpacity>
-        </View> */}
+              <Ionicons name="chevron-forward" size={20} color="#525252" />
+            </TouchableOpacity>
+          </View>
 
-        <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
-          <TouchableOpacity
-            onPress={handleResetData}
-            className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
-          >
-            <View className="flex-row items-center gap-3">
-              <View className="items-center justify-center w-8 h-8 rounded-full bg-red-500/20">
-                <Ionicons name="trash" size={18} color="#ef4444" />
+          <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+            <TouchableOpacity
+              onPress={() => router.push("/about")}
+              className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+            >
+              <View className="flex-row items-center gap-3">
+                <View className="items-center justify-center w-8 h-8 rounded-full bg-blue-500/20">
+                  <Ionicons
+                    name="information-circle"
+                    size={18}
+                    color="#3b82f6"
+                  />
+                </View>
+                <Text className="font-medium text-white">About Us</Text>
               </View>
-              <Text className="font-medium text-red-500">Reset All Data</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#525252" />
-          </TouchableOpacity>
+              <Ionicons name="chevron-forward" size={20} color="#525252" />
+            </TouchableOpacity>
+          </View>
+
+          <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+            <TouchableOpacity
+              onPress={handleResetData}
+              className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+            >
+              <View className="flex-row items-center gap-3">
+                <View className="items-center justify-center w-8 h-8 rounded-full bg-red-500/20">
+                  <Ionicons name="trash" size={18} color="#ef4444" />
+                </View>
+                <Text className="font-medium text-red-500">Reset All Data</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#525252" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 

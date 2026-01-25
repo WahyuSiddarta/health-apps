@@ -5,8 +5,10 @@ import * as Sentry from "@sentry/react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { I18nextProvider } from "react-i18next";
 import "react-native-reanimated";
 import { initDatabase } from "../database/init";
+import i18next from "../i18n";
 import "./index.css";
 
 Sentry.init({
@@ -38,23 +40,29 @@ export default Sentry.wrap(function RootLayout() {
   }, []);
 
   return (
-    <ToastProvider>
-      <CopilotContextProvider>
-        <ThemeProvider value={DarkTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="personal-target"
-              options={{ headerShown: false, presentation: "card" }}
-            />
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
-          </Stack>
-          <StatusBar style="light" />
-        </ThemeProvider>
-      </CopilotContextProvider>
-    </ToastProvider>
+    <I18nextProvider i18n={i18next}>
+      <ToastProvider>
+        <CopilotContextProvider>
+          <ThemeProvider value={DarkTheme}>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="personal-target"
+                options={{ headerShown: false, presentation: "card" }}
+              />
+              <Stack.Screen
+                name="about"
+                options={{ headerShown: false, presentation: "card" }}
+              />
+              <Stack.Screen
+                name="modal"
+                options={{ presentation: "modal", title: "Modal" }}
+              />
+            </Stack>
+            <StatusBar style="light" />
+          </ThemeProvider>
+        </CopilotContextProvider>
+      </ToastProvider>
+    </I18nextProvider>
   );
 });
