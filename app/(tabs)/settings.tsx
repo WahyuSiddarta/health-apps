@@ -53,7 +53,7 @@ export default function SettingsScreen() {
     }
     {
       tutorialReset && (
-        <View className="p-3 mb-4 rounded-lg bg-green-500/20 border border-green-500/50">
+        <View className="p-3 mb-4 border rounded-lg bg-green-500/20 border-green-500/50">
           <Text className="text-sm font-medium text-green-400">
             Tutorial progress has been reset.
           </Text>
@@ -66,7 +66,7 @@ export default function SettingsScreen() {
     }
     <View className="mb-4 overflow-hidden bg-neutral-900 rounded-xl">
       <TouchableOpacity
-        onPress={startTutorial}
+        onPress={() => startTutorial()}
         className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
       >
         <View className="flex-row items-center gap-3">
