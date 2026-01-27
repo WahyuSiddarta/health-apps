@@ -16,6 +16,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -27,6 +28,7 @@ import {
 import { PieChart } from "react-native-gifted-charts";
 
 export default function FoodScreen() {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [name, setName] = useState("");
   const [calories, setCalories] = useState("");
@@ -45,6 +47,9 @@ export default function FoodScreen() {
   );
   const [filterDate, setFilterDate] = useState<string | undefined>(undefined);
   const [userTarget, setUserTarget] = useState<UserTarget | null>(null);
+  const [deleteConfirmingId, setDeleteConfirmingId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     const p = parseFloat(protein) || 0;
@@ -170,7 +175,7 @@ export default function FoodScreen() {
 
   const handleSubmit = () => {
     if (!name) {
-      showToast("Please fill in name", "error");
+      showToast(t("pages.food.pleaseEnterName"), "error");
       return;
     }
 
@@ -190,7 +195,7 @@ export default function FoodScreen() {
           sugar ? parseFloat(sugar) : 0,
           name,
         );
-        showToast("Food updated successfully", "success");
+        showToast(t("pages.food.foodUpdatedSuccess"), "success");
       } else {
         addFood(
           1, // userId
@@ -204,7 +209,7 @@ export default function FoodScreen() {
           sugar ? parseFloat(sugar) : 0,
           name,
         );
-        showToast("Food added successfully", "success");
+        showToast(t("pages.food.foodAddedSuccess"), "success");
       }
       setName("");
       setCalories("");
@@ -218,7 +223,9 @@ export default function FoodScreen() {
       loadFoodLogs();
     } catch (error) {
       showToast(
-        editingId ? "Failed to update food" : "Failed to add food",
+        editingId
+          ? t("pages.food.failedUpdateFood")
+          : t("pages.food.failedAddFood"),
         "error",
       );
     }
@@ -237,22 +244,18 @@ export default function FoodScreen() {
   };
 
   const handleDelete = (id: number) => {
-    try {
-      deleteFood(id);
-      loadFoodLogs();
-      showToast("Food deleted successfully", "success");
-    } catch (error) {
-      showToast("Failed to delete food", "error");
-    }
+    setDeleteConfirmingId(id);
   };
 
   return (
-    <ScreenWrapper title="Food">
+    <ScreenWrapper title={t("pages.food.title")}>
       <View className="flex-1">
         <ScrollView className="flex-1 p-4">
           <View className="mb-4">
             <View className="flex-row items-center justify-between mb-4">
-              <ThemedText type="subtitle">Recent Food Logs</ThemedText>
+              <ThemedText type="subtitle">
+                {t("pages.food.recentFoodLogs")}
+              </ThemedText>
               <TouchableOpacity
                 onPress={() => setIsFilterVisible(true)}
                 className={`p-2 rounded-lg ${
@@ -274,7 +277,9 @@ export default function FoodScreen() {
 
           {filter === "Daily" && dailyTotals && (
             <View className="p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
-              <Text className="mb-4 font-bold text-white">Daily Totals</Text>
+              <Text className="mb-4 font-bold text-white">
+                {t("pages.food.dailyTotals")}
+              </Text>
               <View className="flex-row flex-wrap justify-between gap-4">
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
                   <Text
@@ -295,7 +300,9 @@ export default function FoodScreen() {
                       </Text>
                     ) : null}
                   </Text>
-                  <Text className="text-xs text-neutral-400">Calories</Text>
+                  <Text className="text-xs text-neutral-400">
+                    {t("pages.food.calories")}
+                  </Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
                   <Text
@@ -319,7 +326,9 @@ export default function FoodScreen() {
                       </Text>
                     ) : null}
                   </Text>
-                  <Text className="text-xs text-neutral-400">Protein</Text>
+                  <Text className="text-xs text-neutral-400">
+                    {t("pages.food.protein")}
+                  </Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
                   <Text
@@ -343,7 +352,9 @@ export default function FoodScreen() {
                       </Text>
                     ) : null}
                   </Text>
-                  <Text className="text-xs text-neutral-400">Carbs</Text>
+                  <Text className="text-xs text-neutral-400">
+                    {t("pages.food.carbs")}
+                  </Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
                   <Text
@@ -365,7 +376,9 @@ export default function FoodScreen() {
                       </Text>
                     ) : null}
                   </Text>
-                  <Text className="text-xs text-neutral-400">Fat</Text>
+                  <Text className="text-xs text-neutral-400">
+                    {t("pages.food.fat")}
+                  </Text>
                 </View>
                 <View className="items-center w-[45%] p-3 rounded-xl bg-neutral-800">
                   <Text
@@ -386,7 +399,9 @@ export default function FoodScreen() {
                       </Text>
                     ) : null}
                   </Text>
-                  <Text className="text-xs text-neutral-400">Sugar</Text>
+                  <Text className="text-xs text-neutral-400">
+                    {t("pages.food.sugar")}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -395,7 +410,7 @@ export default function FoodScreen() {
           {filter === "Daily" && (
             <View className="items-center p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
               <Text className="self-start mb-4 font-bold text-white">
-                Daily Macro Breakdown
+                {t("pages.food.dailyMacroBreakdown")}
               </Text>
               <PieChart
                 data={macroStats}
@@ -424,7 +439,7 @@ export default function FoodScreen() {
           {filter === "Weekly" && (
             <View className="p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
               <Text className="mb-4 font-bold text-white">
-                Weekly Calorie Breakdown
+                {t("pages.food.weeklyCalorieBreakdown")}
               </Text>
               <View className="gap-3">
                 {weeklyStats.map((stat) => (
@@ -462,8 +477,8 @@ export default function FoodScreen() {
                           }`}
                         >
                           {stat.total > userTarget.nutrition_caloric
-                            ? "Over "
-                            : "Left "}
+                            ? t("pages.food.over")
+                            : t("pages.food.left")}{" "}
                           {Math.abs(
                             Math.round(
                               stat.total - userTarget.nutrition_caloric,
@@ -536,7 +551,7 @@ export default function FoodScreen() {
 
           {foodLogs.length === 0 && (
             <Text className="mt-8 text-center text-neutral-500">
-              No food logs recorded yet
+              {t("pages.food.noFoodLogs")}
             </Text>
           )}
 
@@ -558,17 +573,21 @@ export default function FoodScreen() {
             }}
             className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
-            <Text className="text-lg font-bold text-white">Add New Food</Text>
+            <Text className="text-lg font-bold text-white">
+              {t("pages.food.addNewFood")}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <BottomSheet
           visible={isFormVisible}
           onClose={() => setIsFormVisible(false)}
-          title={editingId ? "Edit Food" : "Add New Food"}
+          title={
+            editingId ? t("pages.food.editFood") : t("pages.food.addNewFood")
+          }
         >
           <InputField
-            label="Name"
+            label={t("pages.food.nameLabel")}
             value={name}
             onChangeText={setName}
             placeholder="e.g. Oatmeal"
@@ -577,12 +596,12 @@ export default function FoodScreen() {
           />
 
           <InputField
-            label="Calories"
+            label={t("pages.food.caloriesLabel")}
             value={calories}
             onChangeText={setCalories}
             keyboardType="numeric"
             useThousandSeparator
-            placeholder="Calculated automatically"
+            placeholder={t("pages.food.calculatedAutomatically")}
             className="mb-4"
             editable={false}
           />
@@ -590,7 +609,7 @@ export default function FoodScreen() {
           <View className="flex-row gap-4 mb-4">
             <View className="flex-1">
               <InputField
-                label="Protein (g)"
+                label={t("pages.food.proteinLabel")}
                 value={protein}
                 onChangeText={setProtein}
                 keyboardType="numeric"
@@ -601,7 +620,7 @@ export default function FoodScreen() {
             </View>
             <View className="flex-1">
               <InputField
-                label="Carbs (g)"
+                label={t("pages.food.carbsLabel")}
                 value={carbs}
                 onChangeText={setCarbs}
                 keyboardType="numeric"
@@ -615,7 +634,7 @@ export default function FoodScreen() {
           <View className="flex-row gap-4 mb-4">
             <View className="flex-1">
               <InputField
-                label="Fat (g)"
+                label={t("pages.food.fatLabel")}
                 value={fat}
                 onChangeText={setFat}
                 keyboardType="numeric"
@@ -626,7 +645,7 @@ export default function FoodScreen() {
             </View>
             <View className="flex-1">
               <InputField
-                label="Sugar (g)"
+                label={t("pages.food.sugarLabel")}
                 value={sugar}
                 onChangeText={setSugar}
                 keyboardType="numeric"
@@ -638,7 +657,7 @@ export default function FoodScreen() {
           </View>
 
           <SegmentedControl
-            label="Category"
+            label={t("pages.food.categoryLabel")}
             options={["Breakfast", "Lunch", "Dinner", "Snack"]}
             value={category}
             onChange={setCategory}
@@ -650,7 +669,7 @@ export default function FoodScreen() {
             className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
             <Text className="text-lg font-bold text-white">
-              {editingId ? "Update Food" : "Add Food"}
+              {editingId ? t("pages.food.updateFood") : t("pages.food.addFood")}
             </Text>
           </TouchableOpacity>
         </BottomSheet>
@@ -658,14 +677,14 @@ export default function FoodScreen() {
         <BottomSheet
           visible={isFilterVisible}
           onClose={() => setIsFilterVisible(false)}
-          title="Filter Food Logs"
+          title={t("pages.food.filterFoodLogs")}
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
             {filter === "All" && (
               <InputField
-                label="Date (YYYY-MM-DD)"
+                label={t("pages.food.dateFilter")}
                 value={filterDate || ""}
                 onChangeText={setFilterDate}
                 placeholder="e.g. 2023-12-25"
@@ -675,7 +694,7 @@ export default function FoodScreen() {
 
             <View className="mb-6">
               <Text className="mb-2 text-sm font-medium text-neutral-400">
-                Category
+                {t("pages.food.categoryFilter")}
               </Text>
               <View className="flex-row flex-wrap gap-2">
                 {["Breakfast", "Lunch", "Dinner", "Snack"].map((cat) => (
@@ -714,16 +733,60 @@ export default function FoodScreen() {
                 }}
                 className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
               >
-                <Text className="font-bold text-white">Clear All</Text>
+                <Text className="font-bold text-white">
+                  {t("pages.food.clearAll")}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => setIsFilterVisible(false)}
                 className="items-center flex-1 p-3 bg-emerald-600 rounded-xl"
               >
-                <Text className="font-bold text-white">Apply Filters</Text>
+                <Text className="font-bold text-white">
+                  {t("pages.food.applyFilters")}
+                </Text>
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
+        </BottomSheet>
+
+        <BottomSheet
+          visible={deleteConfirmingId !== null}
+          onClose={() => setDeleteConfirmingId(null)}
+          title={t("pages.food.deleteFoodConfirmationTitle")}
+        >
+          <Text className="mb-6 text-neutral-300">
+            {t("pages.food.deleteFoodConfirmationMessage")}
+          </Text>
+
+          <View className="flex-row gap-4">
+            <TouchableOpacity
+              onPress={() => setDeleteConfirmingId(null)}
+              className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
+            >
+              <Text className="font-bold text-white">
+                {t("pages.food.cancel")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if (deleteConfirmingId) {
+                  try {
+                    deleteFood(deleteConfirmingId);
+                    setDeleteConfirmingId(null);
+                    loadFoodLogs();
+                    showToast(t("pages.food.foodDeletedSuccess"), "success");
+                  } catch (error) {
+                    showToast(t("pages.food.failedDeleteFood"), "error");
+                  }
+                }
+              }}
+              className="items-center flex-1 p-3 bg-red-600 rounded-xl"
+            >
+              <Text className="font-bold text-white">
+                {t("pages.food.delete")}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </BottomSheet>
       </View>
     </ScreenWrapper>

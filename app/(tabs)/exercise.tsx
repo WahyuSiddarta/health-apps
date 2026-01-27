@@ -14,9 +14,11 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function ExerciseScreen() {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [name, setName] = useState("");
   const [minute, setMinute] = useState("");
@@ -30,9 +32,12 @@ export default function ExerciseScreen() {
   const [filter, setFilter] = useState<"Weekly" | "All">("Weekly");
   const [filterType, setFilterType] = useState<string | undefined>(undefined);
   const [filterIntensity, setFilterIntensity] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [filterDate, setFilterDate] = useState<string | undefined>(undefined);
+  const [deleteConfirmingId, setDeleteConfirmingId] = useState<number | null>(
+    null,
+  );
 
   const getExerciseIcon = (type: string) => {
     switch (type) {
@@ -90,8 +95,8 @@ export default function ExerciseScreen() {
       const now = new Date();
       const firstDay = new Date(
         now.setDate(
-          now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)
-        )
+          now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1),
+        ),
       ); // Monday
       const lastDay = new Date(now.setDate(now.getDate() - now.getDay() + 7)); // Sunday
       startDate = firstDay.toISOString();
@@ -113,12 +118,12 @@ export default function ExerciseScreen() {
   useFocusEffect(
     useCallback(() => {
       loadExercises();
-    }, [loadExercises])
+    }, [loadExercises]),
   );
 
   const handleSubmit = () => {
     if (!name || !caloric || !intensity) {
-      showToast("Please fill in all required fields", "error");
+      showToast(t("pages.exercise.pleaseEnterRequiredFields"), "error");
       return;
     }
 
@@ -130,9 +135,9 @@ export default function ExerciseScreen() {
           minute ? parseInt(minute) : null,
           parseInt(caloric),
           intensity,
-          type
+          type,
         );
-        showToast("Exercise updated successfully", "success");
+        showToast(t("pages.exercise.exerciseUpdatedSuccess"), "success");
       } else {
         addExercise(
           name,
@@ -140,9 +145,9 @@ export default function ExerciseScreen() {
           minute ? parseInt(minute) : null,
           parseInt(caloric),
           intensity,
-          type
+          type,
         );
-        showToast("Exercise added successfully", "success");
+        showToast(t("pages.exercise.exerciseAddedSuccess"), "success");
       }
       setName("");
       setMinute("");
@@ -154,8 +159,10 @@ export default function ExerciseScreen() {
       loadExercises();
     } catch (error) {
       showToast(
-        editingId ? "Failed to update exercise" : "Failed to add exercise",
-        "error"
+        editingId
+          ? t("pages.exercise.failedUpdateExercise")
+          : t("pages.exercise.failedAddExercise"),
+        "error",
       );
     }
   };
@@ -171,21 +178,17 @@ export default function ExerciseScreen() {
   };
 
   const handleDelete = (id: number) => {
-    try {
-      deleteExercise(id);
-      loadExercises();
-      showToast("Exercise deleted successfully", "success");
-    } catch (error) {
-      showToast("Failed to delete exercise", "error");
-    }
+    setDeleteConfirmingId(id);
   };
 
   return (
-    <ScreenWrapper title="Exercise">
+    <ScreenWrapper title={t("pages.exercise.title")}>
       <View className="flex-1">
         <ScrollView className="flex-1 p-4">
-          <View className="flex-row justify-between items-center mb-4">
-            <ThemedText type="subtitle">Recent Exercises</ThemedText>
+          <View className="flex-row items-center justify-between mb-4">
+            <ThemedText type="subtitle">
+              {t("pages.exercise.recentExercises")}
+            </ThemedText>
             <View className="flex-row gap-2">
               <TouchableOpacity
                 onPress={() => setIsFilterVisible(true)}
@@ -210,17 +213,17 @@ export default function ExerciseScreen() {
           </View>
 
           {filter === "Weekly" && (
-            <View className="bg-neutral-900 p-4 rounded-2xl mb-6 border border-neutral-800">
-              <Text className="text-white font-bold mb-4">
-                Weekly Calorie Breakdown
+            <View className="p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
+              <Text className="mb-4 font-bold text-white">
+                {t("pages.exercise.weeklyCalorieBreakdown")}
               </Text>
               <View className="gap-3">
                 {weeklyStats.map((stat) => (
                   <View key={stat.day} className="flex-row items-center">
-                    <Text className="text-neutral-400 w-8 font-medium">
+                    <Text className="w-8 font-medium text-neutral-400">
                       {stat.day}
                     </Text>
-                    <View className="flex-1 h-6 bg-neutral-800 rounded-full flex-row overflow-hidden mx-2">
+                    <View className="flex-row flex-1 h-6 mx-2 overflow-hidden rounded-full bg-neutral-800">
                       {Object.entries(stat.breakdown).map(
                         ([type, calories]) => {
                           const width = (calories / maxCalories) * 100;
@@ -234,16 +237,16 @@ export default function ExerciseScreen() {
                               }}
                             />
                           );
-                        }
+                        },
                       )}
                     </View>
-                    <Text className="text-white w-10 text-right text-xs">
+                    <Text className="w-10 text-xs text-right text-white">
                       {stat.total > 0 ? stat.total : ""}
                     </Text>
                   </View>
                 ))}
               </View>
-              <View className="flex-row flex-wrap gap-4 mt-4 justify-center">
+              <View className="flex-row flex-wrap justify-center gap-4 mt-4">
                 {["Cardio", "Weight Training", "Recovery", "HIT"].map(
                   (type) => (
                     <View key={type} className="flex-row items-center gap-2">
@@ -251,9 +254,9 @@ export default function ExerciseScreen() {
                         className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: getExerciseIcon(type).color }}
                       />
-                      <Text className="text-neutral-400 text-xs">{type}</Text>
+                      <Text className="text-xs text-neutral-400">{type}</Text>
                     </View>
-                  )
+                  ),
                 )}
               </View>
             </View>
@@ -264,9 +267,9 @@ export default function ExerciseScreen() {
             return (
               <View
                 key={exercise.id}
-                className="bg-neutral-900 p-4 rounded-2xl mb-3 flex-row justify-between items-center border border-neutral-800"
+                className="flex-row items-center justify-between p-4 mb-3 border bg-neutral-900 rounded-2xl border-neutral-800"
               >
-                <View className="mr-4 bg-neutral-800 p-3 rounded-full">
+                <View className="p-3 mr-4 rounded-full bg-neutral-800">
                   <Ionicons
                     name={icon.name as any}
                     size={24}
@@ -274,27 +277,30 @@ export default function ExerciseScreen() {
                   />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-white font-bold text-lg">
+                  <Text className="text-lg font-bold text-white">
                     {exercise.name}
                   </Text>
-                  <Text className="text-neutral-400 mt-1">
-                    {exercise.minute ? `${exercise.minute} min` : "N/A"} •{" "}
-                    {exercise.caloric} kcal • {exercise.intensity}
+                  <Text className="mt-1 text-neutral-400">
+                    {exercise.minute
+                      ? `${exercise.minute} ${t("pages.exercise.min")}`
+                      : "N/A"}{" "}
+                    • {exercise.caloric} ${t("pages.exercise.kcal")} •{" "}
+                    {exercise.intensity}
                   </Text>
-                  <Text className="text-neutral-500 text-xs mt-2">
+                  <Text className="mt-2 text-xs text-neutral-500">
                     {new Date(exercise.record_at).toLocaleString()}
                   </Text>
                 </View>
                 <View className="flex-col gap-2 ml-2">
                   <TouchableOpacity
                     onPress={() => handleEdit(exercise)}
-                    className="bg-blue-500/10 p-2 rounded-full"
+                    className="p-2 rounded-full bg-blue-500/10"
                   >
                     <Ionicons name="pencil" size={16} color="#3b82f6" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => handleDelete(exercise.id)}
-                    className="bg-red-500/10 p-2 rounded-full"
+                    className="p-2 rounded-full bg-red-500/10"
                   >
                     <Ionicons name="trash" size={16} color="#ef4444" />
                   </TouchableOpacity>
@@ -304,15 +310,15 @@ export default function ExerciseScreen() {
           })}
 
           {exercises.length === 0 && (
-            <Text className="text-neutral-500 text-center mt-8">
-              No exercises recorded yet
+            <Text className="mt-8 text-center text-neutral-500">
+              {t("pages.exercise.noExercises")}
             </Text>
           )}
 
           <View className="h-20" />
         </ScrollView>
 
-        <View className="p-4 border-t border-neutral-800 bg-black">
+        <View className="p-4 bg-black border-t border-neutral-800">
           <TouchableOpacity
             onPress={() => {
               setName("");
@@ -323,10 +329,10 @@ export default function ExerciseScreen() {
               setEditingId(null);
               setIsFormVisible(true);
             }}
-            className="bg-emerald-600 p-3 rounded-xl items-center shadow-sm active:bg-emerald-700"
+            className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
-            <Text className="text-white font-bold text-lg">
-              Add New Exercise
+            <Text className="text-lg font-bold text-white">
+              {t("pages.exercise.addNewExercise")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -334,10 +340,14 @@ export default function ExerciseScreen() {
         <BottomSheet
           visible={isFormVisible}
           onClose={() => setIsFormVisible(false)}
-          title={editingId ? "Edit Exercise" : "Add New Exercise"}
+          title={
+            editingId
+              ? t("pages.exercise.editExercise")
+              : t("pages.exercise.addNewExercise")
+          }
         >
           <InputField
-            label="Name"
+            label={t("pages.exercise.nameLabel")}
             value={name}
             onChangeText={setName}
             placeholder="e.g. Running"
@@ -345,7 +355,7 @@ export default function ExerciseScreen() {
           />
 
           <InputField
-            label="Duration (minutes)"
+            label={t("pages.exercise.durationLabel")}
             value={minute}
             onChangeText={setMinute}
             keyboardType="numeric"
@@ -355,7 +365,7 @@ export default function ExerciseScreen() {
           />
 
           <InputField
-            label="Calories"
+            label={t("pages.exercise.caloriesLabel")}
             value={caloric}
             onChangeText={setCaloric}
             keyboardType="numeric"
@@ -365,7 +375,7 @@ export default function ExerciseScreen() {
           />
 
           <SegmentedControl
-            label="Intensity"
+            label={t("pages.exercise.intensityLabel")}
             options={["Low", "Medium", "High"]}
             value={intensity}
             onChange={setIntensity}
@@ -373,7 +383,7 @@ export default function ExerciseScreen() {
           />
 
           <SegmentedControl
-            label="Type"
+            label={t("pages.exercise.typeLabel")}
             options={["Cardio", "Weight Training", "Recovery", "HIT"]}
             value={type}
             onChange={setType}
@@ -382,10 +392,12 @@ export default function ExerciseScreen() {
 
           <TouchableOpacity
             onPress={handleSubmit}
-            className="bg-emerald-600 p-3 rounded-xl items-center shadow-sm active:bg-emerald-700"
+            className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
-            <Text className="text-white font-bold text-lg">
-              {editingId ? "Update Exercise" : "Add Exercise"}
+            <Text className="text-lg font-bold text-white">
+              {editingId
+                ? t("pages.exercise.updateExercise")
+                : t("pages.exercise.addExercise")}
             </Text>
           </TouchableOpacity>
         </BottomSheet>
@@ -393,11 +405,11 @@ export default function ExerciseScreen() {
         <BottomSheet
           visible={isFilterVisible}
           onClose={() => setIsFilterVisible(false)}
-          title="Filter Exercises"
+          title={t("pages.exercise.filterExercises")}
         >
           {filter === "All" && (
             <InputField
-              label="Date (YYYY-MM-DD)"
+              label={t("pages.exercise.dateFilter")}
               value={filterDate || ""}
               onChangeText={setFilterDate}
               placeholder="e.g. 2023-12-25"
@@ -406,7 +418,7 @@ export default function ExerciseScreen() {
           )}
 
           <View className="mb-4">
-            <Text className="text-neutral-400 mb-2 text-sm font-medium">
+            <Text className="mb-2 text-sm font-medium text-neutral-400">
               Type
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -435,7 +447,7 @@ export default function ExerciseScreen() {
           </View>
 
           <View className="mb-6">
-            <Text className="text-neutral-400 mb-2 text-sm font-medium">
+            <Text className="mb-2 text-sm font-medium text-neutral-400">
               Intensity
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -470,15 +482,65 @@ export default function ExerciseScreen() {
                 setFilterIntensity(undefined);
                 setFilterDate(undefined);
               }}
-              className="flex-1 bg-neutral-800 p-3 rounded-xl items-center"
+              className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
             >
-              <Text className="text-white font-bold">Clear All</Text>
+              <Text className="font-bold text-white">
+                {t("pages.exercise.clearAll")}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setIsFilterVisible(false)}
-              className="flex-1 bg-emerald-600 p-3 rounded-xl items-center"
+              className="items-center flex-1 p-3 bg-emerald-600 rounded-xl"
             >
-              <Text className="text-white font-bold">Apply Filters</Text>
+              <Text className="font-bold text-white">
+                {t("pages.exercise.applyFilters")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
+
+        <BottomSheet
+          visible={deleteConfirmingId !== null}
+          onClose={() => setDeleteConfirmingId(null)}
+          title={t("pages.exercise.deleteExerciseConfirmationTitle")}
+        >
+          <Text className="mb-6 text-neutral-300">
+            {t("pages.exercise.deleteExerciseConfirmationMessage")}
+          </Text>
+
+          <View className="flex-row gap-4">
+            <TouchableOpacity
+              onPress={() => setDeleteConfirmingId(null)}
+              className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
+            >
+              <Text className="font-bold text-white">
+                {t("pages.exercise.cancel")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if (deleteConfirmingId) {
+                  try {
+                    deleteExercise(deleteConfirmingId);
+                    setDeleteConfirmingId(null);
+                    loadExercises();
+                    showToast(
+                      t("pages.exercise.exerciseDeletedSuccess"),
+                      "success",
+                    );
+                  } catch (error) {
+                    showToast(
+                      t("pages.exercise.failedDeleteExercise"),
+                      "error",
+                    );
+                  }
+                }
+              }}
+              className="items-center flex-1 p-3 bg-red-600 rounded-xl"
+            >
+              <Text className="font-bold text-white">
+                {t("pages.exercise.delete")}
+              </Text>
             </TouchableOpacity>
           </View>
         </BottomSheet>

@@ -14,10 +14,12 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
 export default function WeightScreen() {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [weight, setWeight] = useState("");
   const [viceralFat, setViceralFat] = useState("");
@@ -30,6 +32,9 @@ export default function WeightScreen() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [filter, setFilter] = useState<"Weekly" | "All">("Weekly");
   const [filterDate, setFilterDate] = useState<string | undefined>(undefined);
+  const [deleteConfirmingId, setDeleteConfirmingId] = useState<number | null>(
+    null,
+  );
 
   const weeklyStats = useMemo(() => {
     if (filter !== "Weekly") return [];
@@ -144,7 +149,7 @@ export default function WeightScreen() {
 
   const handleSubmit = () => {
     if (!weight) {
-      showToast("Please enter weight", "error");
+      showToast(t("pages.weight.pleaseEnterWeight"), "error");
       return;
     }
 
@@ -161,7 +166,7 @@ export default function WeightScreen() {
           weightLogs.find((w) => w.id === editingId)?.measured_at ||
             new Date().toISOString(),
         );
-        showToast("Weight updated successfully", "success");
+        showToast(t("pages.weight.weightUpdatedSuccess"), "success");
       } else {
         addWeight(
           1, // userId
@@ -172,7 +177,7 @@ export default function WeightScreen() {
           waistCm ? parseFloat(waistCm) : null,
           new Date().toISOString(),
         );
-        showToast("Weight added successfully", "success");
+        showToast(t("pages.weight.weightAddedSuccess"), "success");
       }
       setWeight("");
       setViceralFat("");
@@ -184,7 +189,9 @@ export default function WeightScreen() {
       loadWeightLogs();
     } catch (error) {
       showToast(
-        editingId ? "Failed to update weight" : "Failed to add weight",
+        editingId
+          ? t("pages.weight.failedUpdateWeight")
+          : t("pages.weight.failedAddWeight"),
         "error",
       );
     }
@@ -201,21 +208,17 @@ export default function WeightScreen() {
   };
 
   const handleDelete = (id: number) => {
-    try {
-      deleteWeight(id);
-      loadWeightLogs();
-      showToast("Weight deleted successfully", "success");
-    } catch (error) {
-      showToast("Failed to delete weight", "error");
-    }
+    setDeleteConfirmingId(id);
   };
 
   return (
-    <ScreenWrapper title="Weight">
+    <ScreenWrapper title={t("pages.weight.title")}>
       <View className="flex-1">
         <ScrollView className="flex-1 p-4">
           <View className="flex-row items-center justify-between mb-4">
-            <ThemedText type="subtitle">Recent Measurements</ThemedText>
+            <ThemedText type="subtitle">
+              {t("pages.weight.recentMeasurements")}
+            </ThemedText>
             <View className="flex-row gap-2">
               <TouchableOpacity
                 onPress={() => setIsFilterVisible(true)}
@@ -237,15 +240,15 @@ export default function WeightScreen() {
             </View>
           </View>
 
-          {filter === "Weekly" && (
+          {filter === "Weekly" ? (
             <View className="p-4 mb-6 border bg-neutral-900 rounded-2xl border-neutral-800">
               <View className="flex-row items-center justify-between mb-6">
                 <Text className="font-bold text-white">
-                  Weekly Weight Trend (Avg)
+                  {t("pages.weight.weeklyWeightTrend")}
                 </Text>
                 {weeklyAverage > 0 && (
                   <Text className="text-xs font-medium text-emerald-500">
-                    Avg: {weeklyAverage.toFixed(1)} kg
+                    {t("pages.weight.avg")}: {weeklyAverage.toFixed(1)} kg
                   </Text>
                 )}
               </View>
@@ -280,15 +283,19 @@ export default function WeightScreen() {
               <View className="flex-row justify-center gap-4 mt-4">
                 <View className="flex-row items-center gap-2">
                   <View className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <Text className="text-xs text-neutral-400">Weight</Text>
+                  <Text className="text-xs text-neutral-400">
+                    {t("pages.weight.weight")}
+                  </Text>
                 </View>
                 <View className="flex-row items-center gap-2">
                   <View className="w-3 h-3 bg-[#F7B600] rounded-full" />
-                  <Text className="text-xs text-neutral-400">Weight Trend</Text>
+                  <Text className="text-xs text-neutral-400">
+                    {t("pages.weight.weightTrend")}
+                  </Text>
                 </View>
               </View>
             </View>
-          )}
+          ) : null}
 
           {weightLogs.map((log) => (
             <View
@@ -300,9 +307,15 @@ export default function WeightScreen() {
                   {log.bodyweight} kg
                 </Text>
                 <Text className="mt-1 text-neutral-400">
-                  {log.fat_percentage ? `Fat: ${log.fat_percentage}% • ` : ""}
-                  {log.viceral_fat ? `VF: ${log.viceral_fat} • ` : ""}
-                  {log.waist_cm ? `Waist: ${log.waist_cm}cm` : ""}
+                  {log.fat_percentage
+                    ? `${t("pages.weight.fat")}: ${log.fat_percentage}% • `
+                    : ""}
+                  {log.viceral_fat
+                    ? `${t("pages.weight.vf")}: ${log.viceral_fat} • `
+                    : ""}
+                  {log.waist_cm
+                    ? `${t("pages.weight.waist")}: ${log.waist_cm}cm`
+                    : ""}
                 </Text>
                 <Text className="mt-1 text-xs text-neutral-500">
                   {new Date(log.measured_at).toLocaleString()}
@@ -327,7 +340,7 @@ export default function WeightScreen() {
 
           {weightLogs.length === 0 && (
             <Text className="mt-8 text-center text-neutral-500">
-              No measurements recorded yet
+              {t("pages.weight.noMeasurements")}
             </Text>
           )}
 
@@ -348,7 +361,7 @@ export default function WeightScreen() {
             className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
             <Text className="text-lg font-bold text-white">
-              Add New Measurement
+              {t("pages.weight.addNewMeasurement")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -356,10 +369,14 @@ export default function WeightScreen() {
         <BottomSheet
           visible={isFormVisible}
           onClose={() => setIsFormVisible(false)}
-          title={editingId ? "Edit Measurement" : "Add New Measurement"}
+          title={
+            editingId
+              ? t("pages.weight.editMeasurement")
+              : t("pages.weight.addNewMeasurement")
+          }
         >
           <InputField
-            label="Weight (kg)"
+            label={t("pages.weight.weightLabel")}
             value={weight}
             onChangeText={setWeight}
             keyboardType="numeric"
@@ -372,7 +389,7 @@ export default function WeightScreen() {
           <View className="flex-row gap-4 mb-4">
             <View className="flex-1">
               <InputField
-                label="Fat %"
+                label={t("pages.weight.fatPercentage")}
                 value={fatPercentage}
                 onChangeText={setFatPercentage}
                 keyboardType="numeric"
@@ -383,7 +400,7 @@ export default function WeightScreen() {
             </View>
             <View className="flex-1">
               <InputField
-                label="Viceral Fat"
+                label={t("pages.weight.viceralFat")}
                 value={viceralFat}
                 onChangeText={setViceralFat}
                 keyboardType="numeric"
@@ -397,7 +414,7 @@ export default function WeightScreen() {
           <View className="flex-row gap-4 mb-4">
             <View className="flex-1">
               <InputField
-                label="Neck (cm)"
+                label={t("pages.weight.neckLabel")}
                 value={neckCm}
                 onChangeText={setNeckCm}
                 keyboardType="numeric"
@@ -408,7 +425,7 @@ export default function WeightScreen() {
             </View>
             <View className="flex-1">
               <InputField
-                label="Waist (cm)"
+                label={t("pages.weight.waistLabel")}
                 value={waistCm}
                 onChangeText={setWaistCm}
                 keyboardType="numeric"
@@ -424,7 +441,9 @@ export default function WeightScreen() {
             className="items-center p-3 shadow-sm bg-emerald-600 rounded-xl active:bg-emerald-700"
           >
             <Text className="text-lg font-bold text-white">
-              {editingId ? "Update Measurement" : "Add Measurement"}
+              {editingId
+                ? t("pages.weight.updateMeasurement")
+                : t("pages.weight.addMeasurement")}
             </Text>
           </TouchableOpacity>
         </BottomSheet>
@@ -432,11 +451,11 @@ export default function WeightScreen() {
         <BottomSheet
           visible={isFilterVisible}
           onClose={() => setIsFilterVisible(false)}
-          title="Filter Measurements"
+          title={t("pages.weight.filterMeasurements")}
         >
           {filter === "All" && (
             <InputField
-              label="Date (YYYY-MM-DD)"
+              label={t("pages.weight.dateFilter")}
               value={filterDate || ""}
               onChangeText={setFilterDate}
               placeholder="e.g. 2023-12-25"
@@ -451,13 +470,60 @@ export default function WeightScreen() {
               }}
               className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
             >
-              <Text className="font-bold text-white">Clear All</Text>
+              <Text className="font-bold text-white">
+                {t("pages.weight.clearAll")}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setIsFilterVisible(false)}
               className="items-center flex-1 p-3 bg-emerald-600 rounded-xl"
             >
-              <Text className="font-bold text-white">Apply Filters</Text>
+              <Text className="font-bold text-white">
+                {t("pages.weight.applyFilters")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
+
+        <BottomSheet
+          visible={deleteConfirmingId !== null}
+          onClose={() => setDeleteConfirmingId(null)}
+          title={t("pages.weight.deleteConfirmationTitle")}
+        >
+          <Text className="mb-6 text-neutral-300">
+            {t("pages.weight.deleteConfirmationMessage")}
+          </Text>
+
+          <View className="flex-row gap-4">
+            <TouchableOpacity
+              onPress={() => setDeleteConfirmingId(null)}
+              className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
+            >
+              <Text className="font-bold text-white">
+                {t("pages.weight.cancel")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                if (deleteConfirmingId) {
+                  try {
+                    deleteWeight(deleteConfirmingId);
+                    setDeleteConfirmingId(null);
+                    loadWeightLogs();
+                    showToast(
+                      t("pages.weight.weightDeletedSuccess"),
+                      "success",
+                    );
+                  } catch (error) {
+                    showToast(t("pages.weight.failedDeleteWeight"), "error");
+                  }
+                }
+              }}
+              className="items-center flex-1 p-3 bg-red-600 rounded-xl"
+            >
+              <Text className="font-bold text-white">
+                {t("pages.weight.delete")}
+              </Text>
             </TouchableOpacity>
           </View>
         </BottomSheet>

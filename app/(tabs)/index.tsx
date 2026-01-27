@@ -14,6 +14,7 @@ import { useCopilotTutorial } from "@/hooks/use-copilot-tutorial";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { CopilotStep, walkthroughable } from "react-native-copilot";
 import { PieChart } from "react-native-gifted-charts";
@@ -22,6 +23,7 @@ import { PieChart } from "react-native-gifted-charts";
 const WalkthroughableView = walkthroughable(View);
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { startTutorial } = useCopilotTutorial();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -66,16 +68,20 @@ export default function DashboardScreen() {
   const caloriesRemaining = calorieTarget - caloriesConsumed + caloriesBurned;
 
   const pieData = [
-    { value: caloriesConsumed, color: "#ef4444", text: "Consumed" },
+    {
+      value: caloriesConsumed,
+      color: "#ef4444",
+      text: t("pages.dashboard.consumed"),
+    },
     {
       value: Math.max(0, caloriesRemaining),
       color: "#10b981",
-      text: "Remaining",
+      text: t("pages.dashboard.remaining"),
     },
   ];
 
   return (
-    <ScreenWrapper title="Dashboard">
+    <ScreenWrapper title={t("pages.dashboard.title")}>
       <ScrollView ref={scrollViewRef} className="flex-1 p-4">
         {/* Dashboard Header */}
         <View className="flex-row items-center justify-end mb-4">
@@ -86,7 +92,7 @@ export default function DashboardScreen() {
               className="px-3 py-2 ml-auto bg-blue-600 rounded-lg"
             >
               <Text className="text-xs font-medium text-white">
-                Start Tutorial
+                {t("pages.dashboard.startTutorial")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -94,7 +100,7 @@ export default function DashboardScreen() {
 
         {/* Calorie Summary Card */}
         <CopilotStep
-          text="This card shows your daily calorie tracking. See how many calories you've consumed, burned, and have remaining."
+          text={t("pages.dashboard.tutorialCalorieCard")}
           order={1}
           name="calorie_card"
         >
@@ -110,16 +116,18 @@ export default function DashboardScreen() {
             }}
           >
             <ThemedText type="subtitle" className="mb-4">
-              Calories Today
+              {t("pages.dashboard.caloriesTitle")}
             </ThemedText>
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-sm text-neutral-400">Remaining</Text>
+                <Text className="text-sm text-neutral-400">
+                  {t("pages.dashboard.remaining")}
+                </Text>
                 <Text className="text-3xl font-bold text-white">
                   {Math.round(caloriesRemaining)}
                 </Text>
                 <Text className="mt-1 text-xs text-neutral-500">
-                  Target: {calorieTarget}
+                  {t("pages.dashboard.target")}: {calorieTarget}
                 </Text>
               </View>
               <PieChart
@@ -133,7 +141,9 @@ export default function DashboardScreen() {
                       <Text className="text-lg font-bold text-white">
                         {Math.round(caloriesConsumed)}
                       </Text>
-                      <Text className="text-xs text-neutral-500">Eaten</Text>
+                      <Text className="text-xs text-neutral-500">
+                        {t("pages.dashboard.eaten")}
+                      </Text>
                     </View>
                   );
                 }}
@@ -144,13 +154,17 @@ export default function DashboardScreen() {
                 <Text className="text-lg font-bold text-emerald-500">
                   {Math.round(caloriesBurned)}
                 </Text>
-                <Text className="text-xs text-neutral-400">Burned</Text>
+                <Text className="text-xs text-neutral-400">
+                  {t("pages.dashboard.burned")}
+                </Text>
               </View>
               <View className="items-center">
                 <Text className="text-lg font-bold text-red-500">
                   {Math.round(caloriesConsumed)}
                 </Text>
-                <Text className="text-xs text-neutral-400">Eaten</Text>
+                <Text className="text-xs text-neutral-400">
+                  {t("pages.dashboard.eaten")}
+                </Text>
               </View>
               <View className="items-center">
                 <Text className="text-lg font-bold text-blue-500">
@@ -159,7 +173,9 @@ export default function DashboardScreen() {
                   )}
                   g
                 </Text>
-                <Text className="text-xs text-neutral-400">Protein</Text>
+                <Text className="text-xs text-neutral-400">
+                  {t("pages.dashboard.protein")}
+                </Text>
               </View>
             </View>
           </WalkthroughableView>
@@ -167,7 +183,7 @@ export default function DashboardScreen() {
 
         {/* Weight Card */}
         <CopilotStep
-          text="Track your weight progress over time. Your latest weight and trends are displayed here."
+          text={t("pages.dashboard.tutorialWeightProgress")}
           order={2}
           name="weight_progress"
         >
@@ -188,15 +204,18 @@ export default function DashboardScreen() {
           >
             <View className="mt-3">
               <ThemedText type="subtitle" className="mb-1">
-                Current Weight
+                {t("pages.dashboard.currentWeight")}
               </ThemedText>
               <Text className="text-3xl font-bold text-white">
                 {latestWeight ? latestWeight.bodyweight : "--"}{" "}
-                <Text className="text-lg text-neutral-500">kg</Text>
+                <Text className="text-lg text-neutral-500">
+                  {t("pages.dashboard.kg")}
+                </Text>
               </Text>
               {userTarget?.bodyweight && (
                 <Text className="mt-1 text-xs text-neutral-500">
-                  Target: {userTarget.bodyweight} kg
+                  {t("pages.dashboard.target")}: {userTarget.bodyweight}{" "}
+                  {t("pages.dashboard.kg")}
                 </Text>
               )}
             </View>
@@ -211,10 +230,10 @@ export default function DashboardScreen() {
 
         {/* Quick Actions */}
         <ThemedText type="subtitle" className="mb-3">
-          Quick Actions
+          {t("pages.dashboard.quickActions")}
         </ThemedText>
         <CopilotStep
-          text="Use these quick action buttons to log your meals, workouts, and weight."
+          text={t("pages.dashboard.tutorialQuickActions")}
           order={3}
           name="quick_actions"
         >
@@ -230,7 +249,9 @@ export default function DashboardScreen() {
               <View className="p-3 mb-2 rounded-full bg-emerald-500/20">
                 <Ionicons name="fast-food" size={24} color="#10b981" />
               </View>
-              <Text className="font-medium text-white">Add Food</Text>
+              <Text className="font-medium text-white">
+                {t("pages.dashboard.addFood")}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -241,7 +262,9 @@ export default function DashboardScreen() {
               <View className="p-3 mb-2 rounded-full bg-blue-500/20">
                 <Ionicons name="bicycle" size={24} color="#3b82f6" />
               </View>
-              <Text className="font-medium text-white">Add Exercise</Text>
+              <Text className="font-medium text-white">
+                {t("pages.dashboard.addExercise")}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -252,18 +275,20 @@ export default function DashboardScreen() {
               <View className="p-3 mb-2 rounded-full bg-orange-500/20">
                 <Ionicons name="scale" size={24} color="#f97316" />
               </View>
-              <Text className="font-medium text-white">Log Weight</Text>
+              <Text className="font-medium text-white">
+                {t("pages.dashboard.logWeight")}
+              </Text>
             </TouchableOpacity>
           </WalkthroughableView>
         </CopilotStep>
 
         {/* Recent Activity */}
         <ThemedText type="subtitle" className="mb-3">
-          Recent Activity
+          {t("pages.dashboard.recentActivity")}
         </ThemedText>
         {todayFood.length === 0 && todayExercise.length === 0 ? (
           <Text className="py-4 text-center text-neutral-500">
-            No activity today
+            {t("pages.dashboard.noActivityToday")}
           </Text>
         ) : (
           <View className="gap-3">
