@@ -16,7 +16,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { PieChart } from "react-native-gifted-charts";
 
 export default function FoodScreen() {
@@ -653,62 +660,70 @@ export default function FoodScreen() {
           onClose={() => setIsFilterVisible(false)}
           title="Filter Food Logs"
         >
-          {filter === "All" && (
-            <InputField
-              label="Date (YYYY-MM-DD)"
-              value={filterDate || ""}
-              onChangeText={setFilterDate}
-              placeholder="e.g. 2023-12-25"
-              className="mb-4"
-            />
-          )}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            {filter === "All" && (
+              <InputField
+                label="Date (YYYY-MM-DD)"
+                value={filterDate || ""}
+                onChangeText={setFilterDate}
+                placeholder="e.g. 2023-12-25"
+                className="mb-4"
+              />
+            )}
 
-          <View className="mb-6">
-            <Text className="mb-2 text-sm font-medium text-neutral-400">
-              Category
-            </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {["Breakfast", "Lunch", "Dinner", "Snack"].map((cat) => (
-                <TouchableOpacity
-                  key={cat}
-                  onPress={() =>
-                    setFilterCategory(filterCategory === cat ? undefined : cat)
-                  }
-                  className={`px-3 py-2 rounded-full border ${
-                    filterCategory === cat
-                      ? "bg-emerald-600 border-emerald-600"
-                      : "bg-neutral-800 border-neutral-700"
-                  }`}
-                >
-                  <Text
-                    className={`${
-                      filterCategory === cat ? "text-white" : "text-neutral-400"
+            <View className="mb-6">
+              <Text className="mb-2 text-sm font-medium text-neutral-400">
+                Category
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                {["Breakfast", "Lunch", "Dinner", "Snack"].map((cat) => (
+                  <TouchableOpacity
+                    key={cat}
+                    onPress={() =>
+                      setFilterCategory(
+                        filterCategory === cat ? undefined : cat,
+                      )
+                    }
+                    className={`px-3 py-2 rounded-full border ${
+                      filterCategory === cat
+                        ? "bg-emerald-600 border-emerald-600"
+                        : "bg-neutral-800 border-neutral-700"
                     }`}
                   >
-                    {cat}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Text
+                      className={`${
+                        filterCategory === cat
+                          ? "text-white"
+                          : "text-neutral-400"
+                      }`}
+                    >
+                      {cat}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
 
-          <View className="flex-row gap-4">
-            <TouchableOpacity
-              onPress={() => {
-                setFilterCategory(undefined);
-                setFilterDate(undefined);
-              }}
-              className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
-            >
-              <Text className="font-bold text-white">Clear All</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setIsFilterVisible(false)}
-              className="items-center flex-1 p-3 bg-emerald-600 rounded-xl"
-            >
-              <Text className="font-bold text-white">Apply Filters</Text>
-            </TouchableOpacity>
-          </View>
+            <View className="flex-row gap-4">
+              <TouchableOpacity
+                onPress={() => {
+                  setFilterCategory(undefined);
+                  setFilterDate(undefined);
+                }}
+                className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
+              >
+                <Text className="font-bold text-white">Clear All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setIsFilterVisible(false)}
+                className="items-center flex-1 p-3 bg-emerald-600 rounded-xl"
+              >
+                <Text className="font-bold text-white">Apply Filters</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
         </BottomSheet>
       </View>
     </ScreenWrapper>

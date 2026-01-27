@@ -2,14 +2,15 @@
   "expo": {
     "name": "Bugarin",
     "slug": "bugarin",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/logo_new.svg",
     "scheme": "bugarin",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.bugarin"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +21,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.bugarin"
+      "package": "com.anonymous.bugarin",
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "output": "static",
