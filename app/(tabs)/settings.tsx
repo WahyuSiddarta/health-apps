@@ -56,7 +56,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScreenWrapper title={t("settings")}>
+    <ScreenWrapper title={t("pages.settings.title")}>
       <View className="flex-1 p-4">
         <View className="mb-4 overflow-hidden bg-neutral-900 rounded-xl">
           <View className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800">
@@ -64,7 +64,9 @@ export default function SettingsScreen() {
               <View className="items-center justify-center w-8 h-8 rounded-full bg-blue-500/20">
                 <Ionicons name="language" size={18} color="#3b82f6" />
               </View>
-              <Text className="font-medium text-white">{t("language")}</Text>
+              <Text className="font-medium text-white">
+                {t("pages.settings.language")}
+              </Text>
             </View>
             <View className="flex-row gap-2">
               <TouchableOpacity onPress={() => changeLanguage("en")}>
@@ -99,7 +101,9 @@ export default function SettingsScreen() {
                 <View className="items-center justify-center w-8 h-8 rounded-full bg-emerald-500/20">
                   <Ionicons name="locate" size={18} color="#10b981" />
                 </View>
-                <Text className="font-medium text-white">Personal Targets</Text>
+                <Text className="font-medium text-white">
+                  {t("pages.settings.personalTargets")}
+                </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#525252" />
             </TouchableOpacity>
@@ -118,7 +122,9 @@ export default function SettingsScreen() {
                     color="#3b82f6"
                   />
                 </View>
-                <Text className="font-medium text-white">About Us</Text>
+                <Text className="font-medium text-white">
+                  {t("pages.settings.aboutUs")}
+                </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#525252" />
             </TouchableOpacity>
@@ -133,7 +139,9 @@ export default function SettingsScreen() {
                 <View className="items-center justify-center w-8 h-8 rounded-full bg-red-500/20">
                   <Ionicons name="trash" size={18} color="#ef4444" />
                 </View>
-                <Text className="font-medium text-red-500">Reset All Data</Text>
+                <Text className="font-medium text-red-500">
+                  {t("pages.settings.resetAllData")}
+                </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#525252" />
             </TouchableOpacity>
@@ -144,12 +152,11 @@ export default function SettingsScreen() {
       <BottomSheet
         visible={isResetVisible}
         onClose={() => !isDeleting && setIsResetVisible(false)}
-        title="Reset All Data"
+        title={t("pages.settings.resetConfirmationTitle")}
       >
         <View className="mb-6">
           <Text className="mb-4 text-neutral-300">
-            Are you sure you want to delete all your data? This action cannot be
-            undone.
+            {t("pages.settings.resetConfirmationMessage")}
           </Text>
         </View>
 
@@ -159,7 +166,9 @@ export default function SettingsScreen() {
             disabled={isDeleting}
             className="items-center flex-1 p-3 bg-neutral-800 rounded-xl"
           >
-            <Text className="font-bold text-white">Cancel</Text>
+            <Text className="font-bold text-white">
+              {t("pages.settings.cancel")}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleConfirmReset}
@@ -167,7 +176,9 @@ export default function SettingsScreen() {
             className="items-center flex-1 p-3 bg-red-600 rounded-xl active:bg-red-700"
           >
             <Text className="font-bold text-white">
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting
+                ? t("pages.settings.deleting")
+                : t("pages.settings.delete")}
             </Text>
           </TouchableOpacity>
         </View>

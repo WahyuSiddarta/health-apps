@@ -11,6 +11,7 @@ import {
 } from "@/database/operations";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   ScrollView,
@@ -23,6 +24,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function PersonalTargetScreen() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [target, setTarget] = useState<UserTarget | null>(null);
@@ -87,7 +89,7 @@ export default function PersonalTargetScreen() {
       }
     } catch (error) {
       console.error(error);
-      showToast("Failed to load targets", "error");
+      showToast(t("pages.personalTarget.failedLoadTargets"), "error");
     } finally {
       setLoading(false);
     }
@@ -104,7 +106,7 @@ export default function PersonalTargetScreen() {
         Number(nutrition.protein) || 0,
         Number(nutrition.carbs) || 0,
         Number(nutrition.fat) || 0,
-        Number(nutrition.sugar) || 0
+        Number(nutrition.sugar) || 0,
       );
 
       // Update Body Measurements
@@ -112,7 +114,7 @@ export default function PersonalTargetScreen() {
         userId,
         Number(body.weight) || 0,
         Number(body.viceralFat) || 0,
-        Number(body.fatPercentage) || 0
+        Number(body.fatPercentage) || 0,
       );
 
       // Update Exercise
@@ -122,20 +124,20 @@ export default function PersonalTargetScreen() {
         Number(exercise.sessions) || 0,
         Number(exercise.caloric) || 0,
         Number(exercise.weightLiftingSessions) || 0,
-        Number(exercise.cardioMinutes) || 0
+        Number(exercise.cardioMinutes) || 0,
       );
 
-      showToast("Targets updated successfully", "success");
+      showToast(t("pages.personalTarget.targetUpdatedSuccess"), "success");
       router.back();
     } catch (error) {
       console.error(error);
-      showToast("Failed to update targets", "error");
+      showToast(t("pages.personalTarget.failedUpdateTargets"), "error");
     }
   };
 
   if (loading) {
     return (
-      <ScreenWrapper title="Personal Targets">
+      <ScreenWrapper title={t("pages.personalTarget.title")}>
         <View className="items-center justify-center flex-1">
           <ActivityIndicator size="large" color="#fff" />
         </View>
@@ -144,15 +146,15 @@ export default function PersonalTargetScreen() {
   }
 
   return (
-    <ScreenWrapper title="Personal Targets" showBackButton>
+    <ScreenWrapper title={t("pages.personalTarget.title")} showBackButton>
       <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
         <View className="mb-8">
           <Text className="mb-4 text-xl font-bold text-white">
-            Nutrition Targets
+            {t("pages.personalTarget.nutritionTargets")}
           </Text>
           <View className="gap-4">
             <InputField
-              label="Daily Calories (kcal)"
+              label={t("pages.personalTarget.dailyCalories")}
               value={nutrition.caloric}
               onChangeText={(text) =>
                 setNutrition({ ...nutrition, caloric: text })
@@ -164,7 +166,7 @@ export default function PersonalTargetScreen() {
             <View className="flex-row gap-4">
               <View className="flex-1">
                 <InputField
-                  label="Protein (g)"
+                  label={t("pages.personalTarget.protein")}
                   value={nutrition.protein}
                   onChangeText={(text) =>
                     setNutrition({ ...nutrition, protein: text })
@@ -175,7 +177,7 @@ export default function PersonalTargetScreen() {
               </View>
               <View className="flex-1">
                 <InputField
-                  label="Carbs (g)"
+                  label={t("pages.personalTarget.carbs")}
                   value={nutrition.carbs}
                   onChangeText={(text) =>
                     setNutrition({ ...nutrition, carbs: text })
@@ -188,7 +190,7 @@ export default function PersonalTargetScreen() {
             <View className="flex-row gap-4">
               <View className="flex-1">
                 <InputField
-                  label="Fat (g)"
+                  label={t("pages.personalTarget.fat")}
                   value={nutrition.fat}
                   onChangeText={(text) =>
                     setNutrition({ ...nutrition, fat: text })
@@ -199,7 +201,7 @@ export default function PersonalTargetScreen() {
               </View>
               <View className="flex-1">
                 <InputField
-                  label="Sugar (g)"
+                  label={t("pages.personalTarget.sugar")}
                   value={nutrition.sugar}
                   onChangeText={(text) =>
                     setNutrition({ ...nutrition, sugar: text })
@@ -214,11 +216,11 @@ export default function PersonalTargetScreen() {
 
         <View className="mb-8">
           <Text className="mb-4 text-xl font-bold text-white">
-            Body Measurements
+            {t("pages.personalTarget.bodyMeasurements")}
           </Text>
           <View className="gap-4">
             <InputField
-              label="Target Body Weight (kg)"
+              label={t("pages.personalTarget.targetBodyWeight")}
               value={body.weight}
               onChangeText={(text) => setBody({ ...body, weight: text })}
               keyboardType="numeric"
@@ -227,7 +229,7 @@ export default function PersonalTargetScreen() {
             <View className="flex-row gap-4">
               <View className="flex-1">
                 <InputField
-                  label="Visceral Fat"
+                  label={t("pages.personalTarget.visceralFat")}
                   value={body.viceralFat}
                   onChangeText={(text) =>
                     setBody({ ...body, viceralFat: text })
@@ -238,7 +240,7 @@ export default function PersonalTargetScreen() {
               </View>
               <View className="flex-1">
                 <InputField
-                  label="Body Fat (%)"
+                  label={t("pages.personalTarget.bodyFat")}
                   value={body.fatPercentage}
                   onChangeText={(text) =>
                     setBody({ ...body, fatPercentage: text })
@@ -253,13 +255,13 @@ export default function PersonalTargetScreen() {
 
         <View className="mb-20">
           <Text className="mb-4 text-xl font-bold text-white">
-            Exercise Targets (Weekly)
+            {t("pages.personalTarget.exerciseTargets")}
           </Text>
           <View className="gap-4">
             <View className="flex-row gap-4">
               <View className="flex-1">
                 <InputField
-                  label="Minutes"
+                  label={t("pages.personalTarget.minutes")}
                   value={exercise.minutes}
                   onChangeText={(text) =>
                     setExercise({ ...exercise, minutes: text })
@@ -270,7 +272,7 @@ export default function PersonalTargetScreen() {
               </View>
               <View className="flex-1">
                 <InputField
-                  label="Sessions"
+                  label={t("pages.personalTarget.sessions")}
                   value={exercise.sessions}
                   onChangeText={(text) =>
                     setExercise({ ...exercise, sessions: text })
@@ -281,7 +283,7 @@ export default function PersonalTargetScreen() {
               </View>
             </View>
             <InputField
-              label="Calories Burned (kcal)"
+              label={t("pages.personalTarget.caloriesBurned")}
               value={exercise.caloric}
               onChangeText={(text) =>
                 setExercise({ ...exercise, caloric: text })
@@ -293,7 +295,7 @@ export default function PersonalTargetScreen() {
             <View className="flex-row gap-4">
               <View className="flex-1">
                 <InputField
-                  label="Weight Lifting Sessions"
+                  label={t("pages.personalTarget.weightLiftingSessions")}
                   value={exercise.weightLiftingSessions}
                   onChangeText={(text) =>
                     setExercise({ ...exercise, weightLiftingSessions: text })
@@ -304,7 +306,7 @@ export default function PersonalTargetScreen() {
               </View>
               <View className="flex-1">
                 <InputField
-                  label="Cardio Minutes"
+                  label={t("pages.personalTarget.cardioMinutes")}
                   value={exercise.cardioMinutes}
                   onChangeText={(text) =>
                     setExercise({ ...exercise, cardioMinutes: text })
@@ -326,7 +328,9 @@ export default function PersonalTargetScreen() {
           onPress={handleSave}
           className="items-center justify-center p-4 rounded-xl bg-primary"
         >
-          <Text className="text-lg font-bold text-white">Save Changes</Text>
+          <Text className="text-lg font-bold text-white">
+            {t("pages.personalTarget.saveChanges")}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScreenWrapper>

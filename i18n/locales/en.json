@@ -1,4 +1,60 @@
 {
   "greeting": "Hello, World!",
-  "personalTarget": "Personal Target"
+  "pages": {
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "personalTargets": "Personal Targets",
+      "aboutUs": "About Us",
+      "resetAllData": "Reset All Data",
+      "resetConfirmationTitle": "Reset All Data",
+      "resetConfirmationMessage": "Are you sure you want to delete all your data? This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "personalTarget": {
+      "title": "Personal Targets",
+      "nutritionTargets": "Nutrition Targets",
+      "dailyCalories": "Daily Calories (kcal)",
+      "protein": "Protein (g)",
+      "carbs": "Carbs (g)",
+      "fat": "Fat (g)",
+      "sugar": "Sugar (g)",
+      "bodyMeasurements": "Body Measurements",
+      "targetBodyWeight": "Target Body Weight (kg)",
+      "visceralFat": "Visceral Fat",
+      "bodyFat": "Body Fat (%)",
+      "exerciseTargets": "Exercise Targets (Weekly)",
+      "minutes": "Minutes",
+      "sessions": "Sessions",
+      "caloriesBurned": "Calories Burned (kcal)",
+      "weightLiftingSessions": "Weight Lifting Sessions",
+      "cardioMinutes": "Cardio Minutes",
+      "saveChanges": "Save Changes",
+      "failedLoadTargets": "Failed to load targets",
+      "failedUpdateTargets": "Failed to update targets",
+      "targetUpdatedSuccess": "Targets updated successfully"
+    },
+    "about": {
+      "title": "About Bugarin",
+      "version": "Version 1.0.1",
+      "description": "Bugarin is a simple health tracking app designed to help you monitor your fitness journey. Track your daily food intake, exercise activities, and weight changes to stay on top of your health goals.",
+      "features": "Features",
+      "foodTracking": "Food Tracking",
+      "foodTrackingDesc": "Log meals and track calories and macros",
+      "exerciseLog": "Exercise Log",
+      "exerciseLogDesc": "Record workouts and burned calories",
+      "weightTracking": "Weight Tracking",
+      "weightTrackingDesc": "Monitor weight changes and trends",
+      "personalTargets": "Personal Targets",
+      "personalTargetsDesc": "Set and manage your health goals",
+      "aboutTitle": "About",
+      "aboutText1": "Bugarin is built with the goal of making health tracking simple and accessible. Whether you're looking to lose weight, gain muscle, or just maintain a healthy lifestyle, Bugarin helps you keep track of your progress with ease.",
+      "aboutText2": "All your data is stored locally on your device, ensuring your privacy and keeping your health information secure.",
+      "contactTitle": "Contact Us",
+      "contactText": "For support or feedback, please reach out to us at:",
+      "email": "wahyu.siddarta97@gmail.com"
+    }
+  }
 }

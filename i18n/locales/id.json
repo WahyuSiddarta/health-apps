@@ -1,6 +1,60 @@
 {
   "greeting": "Halo, Dunia!",
-  "personalTarget": "Target Pribadi",
-  "settings": "Pengaturan",
-  "language": "Bahasa"
+  "pages": {
+    "settings": {
+      "title": "Pengaturan",
+      "language": "Bahasa",
+      "personalTargets": "Target Pribadi",
+      "aboutUs": "Tentang Kami",
+      "resetAllData": "Reset Semua Data",
+      "resetConfirmationTitle": "Reset Semua Data",
+      "resetConfirmationMessage": "Apakah Anda yakin ingin menghapus semua data Anda? Tindakan ini tidak dapat dibatalkan.",
+      "cancel": "Batal",
+      "delete": "Hapus",
+      "deleting": "Menghapus..."
+    },
+    "personalTarget": {
+      "title": "Target Pribadi",
+      "nutritionTargets": "Target Nutrisi",
+      "dailyCalories": "Kalori Harian (kcal)",
+      "protein": "Protein (g)",
+      "carbs": "Karbohidrat (g)",
+      "fat": "Lemak (g)",
+      "sugar": "Gula (g)",
+      "bodyMeasurements": "Pengukuran Tubuh",
+      "targetBodyWeight": "Target Berat Badan (kg)",
+      "visceralFat": "Lemak Visceral",
+      "bodyFat": "Lemak Tubuh (%)",
+      "exerciseTargets": "Target Olahraga (Mingguan)",
+      "minutes": "Menit",
+      "sessions": "Sesi",
+      "caloriesBurned": "Kalori Terbakar (kcal)",
+      "weightLiftingSessions": "Sesi Angkat Beban",
+      "cardioMinutes": "Menit Cardio",
+      "saveChanges": "Simpan Perubahan",
+      "failedLoadTargets": "Gagal memuat target",
+      "failedUpdateTargets": "Gagal memperbarui target",
+      "targetUpdatedSuccess": "Target berhasil diperbarui"
+    },
+    "about": {
+      "title": "Tentang Bugarin",
+      "version": "Versi 1.0.1",
+      "description": "Bugarin adalah aplikasi pelacakan kesehatan sederhana yang dirancang untuk membantu Anda memantau perjalanan kebugaran Anda. Pantau asupan makanan harian, aktivitas olahraga, dan perubahan berat badan untuk tetap fokus pada tujuan kesehatan Anda.",
+      "features": "Fitur",
+      "foodTracking": "Pelacakan Makanan",
+      "foodTrackingDesc": "Catat makanan dan lacak kalori serta makro",
+      "exerciseLog": "Log Olahraga",
+      "exerciseLogDesc": "Catat latihan dan kalori yang terbakar",
+      "weightTracking": "Pelacakan Berat Badan",
+      "weightTrackingDesc": "Pantau perubahan dan tren berat badan",
+      "personalTargets": "Target Pribadi",
+      "personalTargetsDesc": "Tetapkan dan kelola tujuan kesehatan Anda",
+      "aboutTitle": "Tentang",
+      "aboutText1": "Bugarin dibangun dengan tujuan untuk membuat pelacakan kesehatan menjadi sederhana dan mudah diakses. Baik Anda ingin menurunkan berat badan, menambah otot, atau hanya mempertahankan gaya hidup sehat, Bugarin membantu Anda melacak kemajuan dengan mudah.",
+      "aboutText2": "Semua data Anda disimpan secara lokal di perangkat Anda, memastikan privasi Anda dan menjaga informasi kesehatan Anda tetap aman.",
+      "contactTitle": "Hubungi Kami",
+      "contactText": "Untuk dukungan atau umpan balik, silakan hubungi kami di:",
+      "email": "wahyu.siddarta97@gmail.com"
+    }
+  }
 }
