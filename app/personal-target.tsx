@@ -1,5 +1,6 @@
 import { ScreenWrapper } from "@/components/screen-wrapper";
 import { InputField } from "@/components/ui/input-field";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { useToast } from "@/context/toast-context";
 import {
   getUserTarget,
@@ -7,6 +8,7 @@ import {
   updatePersonalBodyMeasurementTarget,
   updatePersonalExerciseTarget,
   updatePersonalNutritionTarget,
+  updatePersonalWeightGoal,
   UserTarget,
 } from "@/database/operations";
 import { useRouter } from "expo-router";
@@ -52,6 +54,8 @@ export default function PersonalTargetScreen() {
     cardioMinutes: "",
   });
 
+  const [weightGoal, setWeightGoal] = useState("weight_loss");
+
   useEffect(() => {
     loadData();
   }, []);
@@ -86,6 +90,7 @@ export default function PersonalTargetScreen() {
           weightLiftingSessions: data.weekly_weight_lifting_sessions.toString(),
           cardioMinutes: data.weekly_cardio_minutes.toString(),
         });
+        setWeightGoal(data.weight_goal || "weight_loss");
       }
     } catch (error) {
       console.error(error);
@@ -125,6 +130,12 @@ export default function PersonalTargetScreen() {
         Number(exercise.caloric) || 0,
         Number(exercise.weightLiftingSessions) || 0,
         Number(exercise.cardioMinutes) || 0,
+      );
+
+      // Update Weight Goal
+      updatePersonalWeightGoal(
+        userId,
+        weightGoal as "weight_loss" | "weight_gain" | "maintain",
       );
 
       showToast(t("pages.personalTarget.targetUpdatedSuccess"), "success");
@@ -251,6 +262,35 @@ export default function PersonalTargetScreen() {
               </View>
             </View>
           </View>
+        </View>
+
+        <View className="mb-8">
+          <SegmentedControl
+            label={t("pages.personalTarget.weightGoal")}
+            options={[
+              t("pages.personalTarget.weightLoss"),
+              t("pages.personalTarget.weightGain"),
+              t("pages.personalTarget.maintain"),
+            ]}
+            value={
+              weightGoal === "weight_loss"
+                ? t("pages.personalTarget.weightLoss")
+                : weightGoal === "weight_gain"
+                  ? t("pages.personalTarget.weightGain")
+                  : t("pages.personalTarget.maintain")
+            }
+            onChange={(displayValue) => {
+              if (displayValue === t("pages.personalTarget.weightLoss")) {
+                setWeightGoal("weight_loss");
+              } else if (
+                displayValue === t("pages.personalTarget.weightGain")
+              ) {
+                setWeightGoal("weight_gain");
+              } else {
+                setWeightGoal("maintain");
+              }
+            }}
+          />
         </View>
 
         <View className="mb-20">

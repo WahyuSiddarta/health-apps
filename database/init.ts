@@ -92,6 +92,13 @@ const migrateUserTargetsTable = () => {
     if (!columns.has("nutrition_sugar")) {
       db.execSync("ALTER TABLE user_targets ADD COLUMN nutrition_sugar REAL");
     }
+
+    // Add 'weight_goal' if missing
+    if (!columns.has("weight_goal")) {
+      db.execSync(
+        "ALTER TABLE user_targets ADD COLUMN weight_goal TEXT DEFAULT 'weight_loss'",
+      );
+    }
   } catch (error) {
     console.error("Error migrating user_targets table:", error);
   }

@@ -34,7 +34,11 @@
       "saveChanges": "Simpan Perubahan",
       "failedLoadTargets": "Gagal memuat target",
       "failedUpdateTargets": "Gagal memperbarui target",
-      "targetUpdatedSuccess": "Target berhasil diperbarui"
+      "targetUpdatedSuccess": "Target berhasil diperbarui",
+      "weightLoss": "Penurunan Berat",
+      "weightGain": "Kenaikan Berat",
+      "maintain": "Pertahankan",
+      "weightGoal": "Tujuan Berat Badan"
     },
     "about": {
       "title": "Tentang Bugarin",
@@ -135,6 +139,7 @@
       "weeklyCalorieBreakdown": "Rincian Kalori Mingguan",
       "over": "Melebihi",
       "left": "Sisa",
+      "under": "Kurang",
       "noFoodLogs": "Belum ada log makanan yang dicatat",
       "addNewFood": "Tambah Makanan Baru",
       "editFood": "Edit Makanan",

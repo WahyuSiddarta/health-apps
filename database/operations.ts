@@ -393,6 +393,7 @@ export interface UserTarget {
   weekly_exercise_caloric: number;
   weekly_weight_lifting_sessions: number;
   weekly_cardio_minutes: number;
+  weight_goal: string;
 }
 
 export const getUserTarget = (userId: number = 1): UserTarget | null => {
@@ -420,8 +421,8 @@ export const initializeUserTarget = (userId: number = 1) => {
     const existing = getUserTarget(userId);
     if (!existing) {
       statement = db.prepareSync(`
-                INSERT INTO user_targets (user_id, nutrition_caloric, nutrition_protein, nutrition_carbohydrate, nutrition_fat, nutrition_sugar, bodyweight, viceral_fat, fat_percentage, weekly_exercise_minutes, weekly_exercise_sessions, weekly_exercise_caloric, weekly_weight_lifting_sessions, weekly_cardio_minutes)
-                VALUES ($userId, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                INSERT INTO user_targets (user_id, nutrition_caloric, nutrition_protein, nutrition_carbohydrate, nutrition_fat, nutrition_sugar, bodyweight, viceral_fat, fat_percentage, weekly_exercise_minutes, weekly_exercise_sessions, weekly_exercise_caloric, weekly_weight_lifting_sessions, weekly_cardio_minutes, weight_goal)
+                VALUES ($userId, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'weight_loss')
             `);
       statement.executeSync({ $userId: userId });
     }
@@ -531,6 +532,31 @@ export const updatePersonalExerciseTarget = (
     });
   } catch (error) {
     console.error("Error updating exercise target:", error);
+    throw error;
+  } finally {
+    if (statement) {
+      statement.finalizeSync();
+    }
+  }
+};
+
+export const updatePersonalWeightGoal = (
+  userId: number,
+  weightGoal: "weight_loss" | "weight_gain" | "maintain",
+) => {
+  let statement;
+  try {
+    statement = db.prepareSync(`
+      UPDATE user_targets SET 
+      weight_goal = $weightGoal
+      WHERE user_id = $userId
+    `);
+    statement.executeSync({
+      $weightGoal: weightGoal,
+      $userId: userId,
+    });
+  } catch (error) {
+    console.error("Error updating weight goal:", error);
     throw error;
   } finally {
     if (statement) {

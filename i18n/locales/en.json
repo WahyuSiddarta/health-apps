@@ -34,7 +34,11 @@
       "saveChanges": "Save Changes",
       "failedLoadTargets": "Failed to load targets",
       "failedUpdateTargets": "Failed to update targets",
-      "targetUpdatedSuccess": "Targets updated successfully"
+      "targetUpdatedSuccess": "Targets updated successfully",
+      "weightLoss": "Weight Loss",
+      "weightGain": "Weight Gain",
+      "maintain": "Maintain",
+      "weightGoal": "Weight Goal"
     },
     "about": {
       "title": "About Bugarin",
@@ -135,6 +139,7 @@
       "weeklyCalorieBreakdown": "Weekly Calorie Breakdown",
       "over": "Over",
       "left": "Left",
+      "under": "Under",
       "noFoodLogs": "No food logs recorded yet",
       "addNewFood": "Add New Food",
       "editFood": "Edit Food",

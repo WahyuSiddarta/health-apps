@@ -30,6 +30,68 @@ import { PieChart } from "react-native-gifted-charts";
 export default function FoodScreen() {
   const { t } = useTranslation();
   const { showToast } = useToast();
+
+  // Helper function to determine calorie status based on weight goal
+  const getCaloricStatus = (current: number, target: number, goal?: string) => {
+    if (!target || target <= 0)
+      return { color: "text-neutral-400", message: "" };
+
+    const difference = current - target;
+
+    if (goal === "gain") {
+      // For weight gain, more calories is better
+      if (difference >= 0) {
+        return {
+          color: "text-emerald-500",
+          message: t("pages.food.over"),
+          value: Math.abs(Math.round(difference)),
+        };
+      } else {
+        return {
+          color: "text-red-500",
+          message: t("pages.food.under"),
+          value: Math.abs(Math.round(difference)),
+        };
+      }
+    } else if (goal === "maintain") {
+      // For maintenance, being close to target is good
+      if (Math.abs(difference) <= target * 0.05) {
+        return {
+          color: "text-emerald-500",
+          message:
+            difference >= 0 ? t("pages.food.over") : t("pages.food.left"),
+          value: Math.abs(Math.round(difference)),
+        };
+      } else if (difference > 0) {
+        return {
+          color: "text-amber-500",
+          message: t("pages.food.over"),
+          value: Math.abs(Math.round(difference)),
+        };
+      } else {
+        return {
+          color: "text-blue-500",
+          message: t("pages.food.left"),
+          value: Math.abs(Math.round(difference)),
+        };
+      }
+    } else {
+      // Default: weight loss - fewer calories is better
+      if (difference <= 0) {
+        return {
+          color: "text-emerald-500",
+          message: t("pages.food.left"),
+          value: Math.abs(Math.round(difference)),
+        };
+      } else {
+        return {
+          color: "text-red-500",
+          message: t("pages.food.over"),
+          value: Math.abs(Math.round(difference)),
+        };
+      }
+    }
+  };
   const [name, setName] = useState("");
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
@@ -285,10 +347,13 @@ export default function FoodScreen() {
                   <Text
                     className={`text-2xl font-bold ${
                       userTarget?.nutrition_caloric &&
-                      userTarget.nutrition_caloric > 0 &&
-                      dailyTotals.calories > userTarget.nutrition_caloric
-                        ? "text-red-500"
-                        : "text-emerald-500"
+                      userTarget.nutrition_caloric > 0
+                        ? getCaloricStatus(
+                            dailyTotals.calories,
+                            userTarget.nutrition_caloric,
+                            userTarget.weight_goal,
+                          ).color
+                        : "text-neutral-400"
                     }`}
                   >
                     {Math.round(dailyTotals.calories)}
@@ -471,19 +536,27 @@ export default function FoodScreen() {
                       stat.total > 0 ? (
                         <Text
                           className={`text-[10px] ${
-                            stat.total > userTarget.nutrition_caloric
-                              ? "text-red-500"
-                              : "text-emerald-500"
+                            getCaloricStatus(
+                              stat.total,
+                              userTarget.nutrition_caloric,
+                              userTarget.weight_goal,
+                            ).color
                           }`}
                         >
-                          {stat.total > userTarget.nutrition_caloric
-                            ? t("pages.food.over")
-                            : t("pages.food.left")}{" "}
-                          {Math.abs(
-                            Math.round(
-                              stat.total - userTarget.nutrition_caloric,
-                            ),
-                          )}
+                          {
+                            getCaloricStatus(
+                              stat.total,
+                              userTarget.nutrition_caloric,
+                              userTarget.weight_goal,
+                            ).message
+                          }{" "}
+                          {
+                            getCaloricStatus(
+                              stat.total,
+                              userTarget.nutrition_caloric,
+                              userTarget.weight_goal,
+                            ).value
+                          }
                         </Text>
                       ) : null}
                     </View>
