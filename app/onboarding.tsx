@@ -1,6 +1,13 @@
 import { useOnboarding } from "@/context/onboarding-context";
-import { createUserProfile } from "@/database/operations";
+import { createUserProfile, getUserProfile, saveUserTargets } from "@/database/operations";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import {
+  ACTIVITY_LEVELS,
+  adjustCalories,
+  calculateBMR,
+  calculateTDEE,
+  type ActivityLevel,
+} from "@/utils/calorie-calculator";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -27,48 +34,52 @@ export default function OnboardingScreen() {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "">("");
   const [height, setHeight] = useState("");
+  const [activityLevel, setActivityLevel] = useState<ActivityLevel | "">("");
   const [goal, setGoal] = useState<
     "weight_loss" | "weight_gain" | "maintain" | ""
   >("");
 
   const steps = [
     {
-      title: t("pages.onboarding.selectLanguage"),
-      subtitle: t("pages.onboarding.selectLanguageSubtitle"),
-      content: (
-        <View className="gap-3">
-          {(["en", "id"] as const).map((lang) => (
-            <TouchableOpacity
-              key={lang}
-              onPress={() => i18n.changeLanguage(lang)}
-              className={`rounded-lg border-2 px-4 py-3 ${
-                i18n.language === lang
-                  ? "border-emerald-500 bg-emerald-500/10"
-                  : "border-gray-600 bg-gray-900"
-              }`}
-            >
-              <Text
-                className={`text-center capitalize ${
-                  i18n.language === lang ? "text-emerald-500" : "text-gray-300"
-                }`}
-              >
-                {lang === "en"
-                  ? t("pages.onboarding.english")
-                  : t("pages.onboarding.indonesian")}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      ),
-    },
-    {
       title: t("pages.onboarding.welcome"),
       subtitle: t("pages.onboarding.welcomeSubtitle"),
       content: (
-        <View className="items-center justify-center gap-6">
-          <Text className="text-lg text-center text-gray-300">
-            {t("pages.onboarding.welcomeDescription")}
-          </Text>
+        <View className="gap-6">
+          <View>
+            <Text className="text-lg text-center text-gray-300">
+              {t("pages.onboarding.welcomeDescription")}
+            </Text>
+          </View>
+          <View>
+            <Text className="mb-3 text-sm font-semibold text-gray-400">
+              {t("pages.onboarding.selectLanguage")}
+            </Text>
+            <View className="gap-2">
+              {(["en", "id"] as const).map((lang) => (
+                <TouchableOpacity
+                  key={lang}
+                  onPress={() => i18n.changeLanguage(lang)}
+                  className={`rounded-lg border-2 px-4 py-2 ${
+                    i18n.language === lang
+                      ? "border-emerald-500 bg-emerald-500/10"
+                      : "border-gray-600 bg-gray-900"
+                  }`}
+                >
+                  <Text
+                    className={`text-center capitalize ${
+                      i18n.language === lang
+                        ? "text-emerald-500"
+                        : "text-gray-300"
+                    }`}
+                  >
+                    {lang === "en"
+                      ? t("pages.onboarding.english")
+                      : t("pages.onboarding.indonesian")}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
       ),
     },
@@ -147,6 +158,72 @@ export default function OnboardingScreen() {
       ),
     },
     {
+      title: t("pages.onboarding.activityLevel"),
+      subtitle: t("pages.onboarding.activityLevelSubtitle"),
+      content: (
+        <View className="gap-3">
+          {(
+            [
+              {
+                value: "sedentary" as ActivityLevel,
+                label: t("pages.onboarding.sedentary"),
+                desc: t("pages.onboarding.sedentaryDesc"),
+              },
+              {
+                value: "lightly_active" as ActivityLevel,
+                label: t("pages.onboarding.lightlyActive"),
+                desc: t("pages.onboarding.lightlyActiveDesc"),
+              },
+              {
+                value: "moderately_active" as ActivityLevel,
+                label: t("pages.onboarding.moderatelyActive"),
+                desc: t("pages.onboarding.moderatelyActiveDesc"),
+              },
+              {
+                value: "very_active" as ActivityLevel,
+                label: t("pages.onboarding.veryActive"),
+                desc: t("pages.onboarding.veryActiveDesc"),
+              },
+              {
+                value: "extra_active" as ActivityLevel,
+                label: t("pages.onboarding.extraActive"),
+                desc: t("pages.onboarding.extraActiveDesc"),
+              },
+            ] as const
+          ).map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              onPress={() => setActivityLevel(option.value)}
+              className={`rounded-lg border-2 px-4 py-3 ${
+                activityLevel === option.value
+                  ? "border-emerald-500 bg-emerald-500/10"
+                  : "border-gray-600 bg-gray-900"
+              }`}
+            >
+              <Text
+                className={`font-semibold ${
+                  activityLevel === option.value
+                    ? "text-emerald-500"
+                    : "text-gray-300"
+                }`}
+              >
+                {option.label}
+              </Text>
+              <Text
+                className={`text-sm mt-1 ${
+                  activityLevel === option.value
+                    ? "text-emerald-400"
+                    : "text-gray-400"
+                }`}
+              >
+                {option.desc}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ),
+    },
+    {
       title: t("pages.onboarding.goal"),
       subtitle: t("pages.onboarding.goalSubtitle"),
       content: (
@@ -187,17 +264,17 @@ export default function OnboardingScreen() {
       case 1:
         return true;
       case 2:
-        return name.trim().length > 0;
-      case 3:
         return age.trim().length > 0 && !isNaN(Number(age)) && Number(age) > 0;
-      case 4:
+      case 3:
         return gender !== "";
-      case 5:
+      case 4:
         return (
           height.trim().length > 0 &&
           !isNaN(Number(height)) &&
           Number(height) > 0
         );
+      case 5:
+        return activityLevel !== "";
       case 6:
         return goal !== "";
       default:
@@ -218,7 +295,7 @@ export default function OnboardingScreen() {
   };
 
   const handleComplete = async () => {
-    if (!name || !age || !gender || !height || !goal) {
+    if (!name || !age || !gender || !height || !activityLevel || !goal) {
       Alert.alert(
         t("pages.onboarding.missingInformation"),
         t("pages.onboarding.fillAllFields"),
@@ -228,7 +305,43 @@ export default function OnboardingScreen() {
 
     setLoading(true);
     try {
+      // Create user profile
       createUserProfile(name, Number(age), gender, Number(height), goal);
+
+      // Calculate BMR and TDEE
+      const bmr = calculateBMR({
+        sex: gender as "male" | "female",
+        weightKg: 0, // We don't have initial weight, will use height as proxy
+        heightCm: Number(height),
+        age: Number(age),
+      });
+
+      const activityMultiplier = ACTIVITY_LEVELS[activityLevel];
+      const tdee = calculateTDEE(bmr, activityMultiplier);
+
+      // Map goal to calorie adjustment
+      let goalType: "maintain" | "cut" | "bulk" = "maintain";
+      if (goal === "weight_loss") goalType = "cut";
+      if (goal === "weight_gain") goalType = "bulk";
+
+      const dailyCalories = adjustCalories(tdee, goalType, 500);
+
+      // Get the created user profile to get user_id
+      const userProfile = getUserProfile();
+      if (userProfile) {
+        // Save targets with calculated calories
+        saveUserTargets(userProfile.user_id, {
+          nutrition_caloric: Math.round(dailyCalories),
+          nutrition_protein: Math.round((dailyCalories * 0.3) / 4), // 30% protein
+          nutrition_carbohydrate: Math.round((dailyCalories * 0.45) / 4), // 45% carbs
+          nutrition_fat: Math.round((dailyCalories * 0.25) / 9), // 25% fat
+          nutrition_sugar: Math.round(dailyCalories * 0.1),
+          weekly_exercise_minutes: 150,
+          weekly_exercise_sessions: 5,
+          weekly_exercise_caloric: Math.round(tdee * 0.2 * 7),
+        });
+      }
+
       setHasCompletedOnboarding(true);
       // Navigate to home screen after a brief delay
       setTimeout(() => {

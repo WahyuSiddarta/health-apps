@@ -217,29 +217,30 @@ export default function DashboardScreen() {
         >
           <WalkthroughableView
             collapsable={false}
+            className="items-center justify-between p-4 mt-4 mb-4 border rounded-2xl border-neutral-700"
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
               padding: 16,
-              marginTop: 16,
               marginBottom: 16,
               backgroundColor: "#171717",
               borderRadius: 16,
               borderWidth: 1,
               borderColor: "#262626",
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
-            <View className="mt-3">
+            <View className="flex-1">
               <ThemedText type="subtitle" className="mb-1">
                 {t("pages.dashboard.currentWeight")}
               </ThemedText>
-              <Text className="text-3xl font-bold text-white">
-                {latestWeight ? latestWeight.bodyweight : "--"}{" "}
+              <View className="flex-row items-baseline gap-1">
+                <Text className="text-3xl font-bold text-white">
+                  {latestWeight ? latestWeight.bodyweight : "--"}
+                </Text>
                 <Text className="text-lg text-neutral-500">
                   {t("pages.dashboard.kg")}
                 </Text>
-              </Text>
+              </View>
               {userTarget?.bodyweight && (
                 <Text className="mt-1 text-xs text-neutral-500">
                   {t("pages.dashboard.target")}: {userTarget.bodyweight}{" "}
@@ -249,7 +250,7 @@ export default function DashboardScreen() {
             </View>
             <TouchableOpacity
               onPress={() => router.push("/(tabs)/weight")}
-              className="p-3 rounded-full bg-neutral-800"
+              className="items-center justify-center w-12 h-12 p-3 rounded-full bg-neutral-800"
             >
               <Ionicons name="chevron-forward" size={24} color="white" />
             </TouchableOpacity>

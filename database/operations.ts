@@ -720,3 +720,47 @@ export const updateUserProfile = (
     return false;
   }
 };
+
+export const saveUserTargets = (
+  userId: number,
+  targets: {
+    nutrition_caloric: number;
+    nutrition_protein: number;
+    nutrition_carbohydrate: number;
+    nutrition_fat: number;
+    nutrition_sugar: number;
+    weekly_exercise_minutes: number;
+    weekly_exercise_sessions: number;
+    weekly_exercise_caloric: number;
+  },
+) => {
+  try {
+    // Initialize target if it doesn't exist
+    initializeUserTarget(userId);
+
+    // Update nutrition targets
+    updatePersonalNutritionTarget(
+      userId,
+      targets.nutrition_caloric,
+      targets.nutrition_protein,
+      targets.nutrition_carbohydrate,
+      targets.nutrition_fat,
+      targets.nutrition_sugar,
+    );
+
+    // Update exercise targets
+    updatePersonalExerciseTarget(
+      userId,
+      targets.weekly_exercise_minutes,
+      targets.weekly_exercise_sessions,
+      targets.weekly_exercise_caloric,
+      0, // weightLiftingSessions
+      0, // cardioMinutes
+    );
+
+    return true;
+  } catch (error) {
+    console.error("Error saving user targets:", error);
+    return false;
+  }
+};
