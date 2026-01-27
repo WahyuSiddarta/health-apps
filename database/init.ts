@@ -61,6 +61,12 @@ export const initDatabase = () => {
         weekly_weight_lifting_sessions INTEGER,
         weekly_cardio_minutes INTEGER
       );
+
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT,
+        updated_at TEXT
+      );
     `);
 
     // 2. Migration Strategy: Check for missing columns and add them safely
@@ -198,7 +204,7 @@ const migrateExercisesTable = () => {
     // Add 'intensity' if missing
     if (!columns.has("intensity")) {
       db.execSync(
-        "ALTER TABLE exercises ADD COLUMN intensity TEXT DEFAULT 'Medium'"
+        "ALTER TABLE exercises ADD COLUMN intensity TEXT DEFAULT 'Medium'",
       );
     }
 

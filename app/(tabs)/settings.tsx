@@ -15,10 +15,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { startTutorial, resetTutorial } = useCopilotTutorial();
+  const { resetTutorial } = useCopilotTutorial();
   const [isResetVisible, setIsResetVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [tutorialReset, setTutorialReset] = useState(false);
   const { t, i18n } = useTranslation();
 
   const changeLanguage = (lng: string) => {
@@ -37,7 +36,6 @@ export default function SettingsScreen() {
     try {
       resetAllData();
       resetTutorial();
-      startTutorial();
       captureMessage("All data reset successfully", {
         level: "info",
         category: "data-operation",

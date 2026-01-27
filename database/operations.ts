@@ -546,8 +546,70 @@ export const resetAllData = () => {
     db.execSync("DELETE FROM food");
     db.execSync("DELETE FROM weight");
     db.execSync("DELETE FROM user_targets");
+    // Reset tutorial status
+    setAppSetting("tutorial_completed", "false");
   } catch (error) {
     captureDatabaseError(error as Error, "resetAllData", {});
     throw error;
+  }
+};
+
+// --- App Settings ---
+
+export const setAppSetting = (key: string, value: string) => {
+  let statement;
+  try {
+    const now = new Date().toISOString();
+    statement = db.prepareSync(
+      "INSERT OR REPLACE INTO app_settings (key, value, updated_at) VALUES ($key, $value, $updated_at)",
+    );
+    statement.executeSync({
+      $key: key,
+      $value: value,
+      $updated_at: now,
+    });
+    console.log("Set app setting:", key, "=", value);
+  } catch (error) {
+    console.error("Error setting app setting:", error);
+  } finally {
+    if (statement) {
+      statement.finalizeSync();
+    }
+  }
+};
+
+export const getAppSetting = (key: string): string | null => {
+  let statement;
+  try {
+    statement = db.prepareSync(
+      "SELECT value FROM app_settings WHERE key = $key",
+    );
+    const result = statement.executeSync({ $key: key });
+    const row = result.getFirstSync() as { value: string } | undefined;
+    const value = row?.value ?? null;
+    console.log("Get app setting:", key, "=", value);
+    return value;
+  } catch (error) {
+    console.error("Error getting app setting:", key, error);
+    return null;
+  } finally {
+    if (statement) {
+      statement.finalizeSync();
+    }
+  }
+};
+
+export const removeAppSetting = (key: string) => {
+  let statement;
+  try {
+    statement = db.prepareSync("DELETE FROM app_settings WHERE key = $key");
+    statement.executeSync({ $key: key });
+    console.log("Removed app setting:", key);
+  } catch (error) {
+    console.error("Error removing app setting:", key, error);
+  } finally {
+    if (statement) {
+      statement.finalizeSync();
+    }
   }
 };

@@ -1,3 +1,4 @@
+import { useCopilotTutorial } from "@/hooks/use-copilot-tutorial";
 import React, { ReactNode, useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import {
@@ -40,6 +41,7 @@ export const CopilotContextProvider: React.FC<CopilotContextProviderProps> = ({
 const CustomTooltip: React.FC<TooltipProps> = () => {
   const { goToNext, goToPrev, stop, currentStep, isFirstStep, isLastStep } =
     useCopilot();
+  const { completeTutorial } = useCopilotTutorial();
 
   const onNext = async () => {
     console.log("Next pressed, calling goToNext");
@@ -64,8 +66,9 @@ const CustomTooltip: React.FC<TooltipProps> = () => {
   const onStop = async () => {
     console.log("Stop pressed, calling stop");
     try {
+      await completeTutorial();
       await stop();
-      console.log("stop completed");
+      console.log("stop and completeTutorial completed");
     } catch (error) {
       console.error("stop error:", error);
     }

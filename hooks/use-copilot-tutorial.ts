@@ -1,9 +1,13 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  getAppSetting,
+  removeAppSetting,
+  setAppSetting,
+} from "@/database/operations";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollView } from "react-native";
 import { useCopilot } from "react-native-copilot";
 
-const TUTORIAL_COMPLETED_KEY = "copilot_tutorial_completed";
+const TUTORIAL_COMPLETED_KEY = "tutorial_completed";
 
 const TUTORIAL_STEPS = [
   {
@@ -47,11 +51,25 @@ export const useCopilotTutorial = () => {
 
   // Initialize copilot
   useEffect(() => {
-    const initTutorial = async () => {
+    const initTutorial = () => {
       try {
         console.log("Initializing tutorial");
-        // Always show tutorial in development
-        setIsTutorialCompleted(false);
+        // Check if tutorial has been completed from SQLite
+        let completed = getAppSetting(TUTORIAL_COMPLETED_KEY);
+        console.log("Tutorial completed status from DB:", completed);
+
+        // If null (first time), initialize to false and treat as not completed
+        if (completed === null) {
+          console.log(
+            "First time user - initializing tutorial setting to false",
+          );
+          setAppSetting(TUTORIAL_COMPLETED_KEY, "false");
+          completed = "false";
+        }
+
+        const isCompleted = completed === "true";
+        console.log("isCompleted:", isCompleted);
+        setIsTutorialCompleted(isCompleted);
 
         // Register steps with copilot if available
         if (copilot && !stepsRegistered.current) {
@@ -61,7 +79,7 @@ export const useCopilotTutorial = () => {
         }
 
         setTutorialReady(true);
-        console.log("Dev mode: Tutorial always shown");
+        console.log("Tutorial initialized, completed:", isCompleted);
       } catch (error) {
         console.error("Error initializing tutorial:", error);
         setTutorialReady(true);
@@ -82,7 +100,7 @@ export const useCopilotTutorial = () => {
         console.log("startTutorial called, copilot:", !!copilot);
         if (copilot && typeof copilot.start === "function") {
           console.log("Starting tutorial now");
-          copilot.start(undefined, scrollViewRef?.current ?? undefined);
+          copilot.start();
         } else {
           console.warn("Copilot not ready", {
             copilot,
@@ -99,8 +117,10 @@ export const useCopilotTutorial = () => {
   // Mark tutorial as completed
   const completeTutorial = useCallback(async () => {
     try {
-      await AsyncStorage.setItem(TUTORIAL_COMPLETED_KEY, "true");
+      console.log("Completing tutorial...");
+      setAppSetting(TUTORIAL_COMPLETED_KEY, "true");
       setIsTutorialCompleted(true);
+      console.log("Tutorial marked as completed");
     } catch (error) {
       console.error("Error marking tutorial as completed:", error);
     }
@@ -109,8 +129,13 @@ export const useCopilotTutorial = () => {
   // Reset tutorial status
   const resetTutorial = useCallback(async () => {
     try {
-      await AsyncStorage.removeItem(TUTORIAL_COMPLETED_KEY);
+      console.log("Resetting tutorial...");
+      removeAppSetting(TUTORIAL_COMPLETED_KEY);
+      // Reset the ref so tutorial can start again
+      stepsRegistered.current = false;
       setIsTutorialCompleted(false);
+      setTutorialReady(true);
+      console.log("Tutorial reset successfully");
     } catch (error) {
       console.error("Error resetting tutorial:", error);
     }

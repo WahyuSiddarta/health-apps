@@ -13,7 +13,7 @@ import {
 import { useCopilotTutorial } from "@/hooks/use-copilot-tutorial";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { CopilotStep, walkthroughable } from "react-native-copilot";
@@ -25,8 +25,10 @@ const WalkthroughableView = walkthroughable(View);
 export default function DashboardScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { startTutorial } = useCopilotTutorial();
+  const { startTutorial, isTutorialCompleted, tutorialReady } =
+    useCopilotTutorial();
   const scrollViewRef = useRef<ScrollView>(null);
+  const tutorialStartedRef = useRef(false);
   const [todayFood, setTodayFood] = useState<FoodRecord[]>([]);
   const [todayExercise, setTodayExercise] = useState<ExerciseRecord[]>([]);
   const [latestWeight, setLatestWeight] = useState<WeightRecord | null>(null);
@@ -49,10 +51,37 @@ export default function DashboardScreen() {
     setUserTarget(target);
   }, []);
 
+  // Auto-start tutorial for first-time users (only once)
+  useEffect(() => {
+    if (tutorialReady && !isTutorialCompleted && !tutorialStartedRef.current) {
+      console.log(
+        "Starting tutorial: tutorialReady=",
+        tutorialReady,
+        "isTutorialCompleted=",
+        isTutorialCompleted,
+      );
+      tutorialStartedRef.current = true;
+      const timeout = setTimeout(() => {
+        startTutorial(scrollViewRef);
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [tutorialReady, isTutorialCompleted, startTutorial]);
+
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [loadData]),
+      // When screen comes into focus, check if tutorial was reset
+      // and reset the ref to allow it to start again
+      if (!isTutorialCompleted) {
+        console.log(
+          "Dashboard focused: tutorial not completed, resetting ref",
+          "isTutorialCompleted=",
+          isTutorialCompleted,
+        );
+        tutorialStartedRef.current = false;
+      }
+    }, [loadData, isTutorialCompleted]),
   );
 
   const caloriesConsumed = todayFood.reduce(
@@ -84,9 +113,9 @@ export default function DashboardScreen() {
     <ScreenWrapper title={t("pages.dashboard.title")}>
       <ScrollView ref={scrollViewRef} className="flex-1 p-4">
         {/* Dashboard Header */}
-        <View className="flex-row items-center justify-end mb-4">
+        {/* DEV ONLY: Tutorial Test Button - Comment out for production */}
+        {/* <View className="flex-row items-center justify-end mb-4">
           <View className="flex-row justify-end gap-2">
-            {/* DEV ONLY: Tutorial Test Button - Comment out for production */}
             <TouchableOpacity
               onPress={() => startTutorial()}
               className="px-3 py-2 ml-auto bg-blue-600 rounded-lg"
@@ -96,12 +125,11 @@ export default function DashboardScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
-
+        </View> */}
         {/* Calorie Summary Card */}
         <CopilotStep
           text={t("pages.dashboard.tutorialCalorieCard")}
-          order={1}
+          order={0}
           name="calorie_card"
         >
           <WalkthroughableView
@@ -184,7 +212,7 @@ export default function DashboardScreen() {
         {/* Weight Card */}
         <CopilotStep
           text={t("pages.dashboard.tutorialWeightProgress")}
-          order={2}
+          order={1}
           name="weight_progress"
         >
           <WalkthroughableView
@@ -234,7 +262,7 @@ export default function DashboardScreen() {
         </ThemedText>
         <CopilotStep
           text={t("pages.dashboard.tutorialQuickActions")}
-          order={3}
+          order={2}
           name="quick_actions"
         >
           <WalkthroughableView
