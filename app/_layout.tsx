@@ -1,4 +1,8 @@
 import { CopilotContextProvider } from "@/context/copilot-context";
+import {
+  OnboardingProvider,
+  useOnboarding,
+} from "@/context/onboarding-context";
 import { ToastProvider } from "@/context/toast-context";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
 import * as Sentry from "@sentry/react-native";
@@ -6,6 +10,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { I18nextProvider } from "react-i18next";
+import { ActivityIndicator, View } from "react-native";
 import "react-native-reanimated";
 import { initDatabase } from "../database/init";
 import i18next from "../i18n";
@@ -34,6 +39,44 @@ export const unstable_settings = {
   anchor: "(tabs)",
 };
 
+function RootLayoutContent() {
+  const { hasCompletedOnboarding, isLoading } = useOnboarding();
+
+  if (isLoading) {
+    return (
+      <View className="items-center justify-center flex-1 bg-gray-950">
+        <ActivityIndicator size="large" color="#10b981" />
+      </View>
+    );
+  }
+
+  if (!hasCompletedOnboarding) {
+    return (
+      <Stack>
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="personal-target"
+        options={{ headerShown: false, presentation: "card" }}
+      />
+      <Stack.Screen
+        name="about"
+        options={{ headerShown: false, presentation: "card" }}
+      />
+      <Stack.Screen
+        name="modal"
+        options={{ presentation: "modal", title: "Modal" }}
+      />
+    </Stack>
+  );
+}
+
 export default Sentry.wrap(function RootLayout() {
   useEffect(() => {
     initDatabase();
@@ -42,26 +85,14 @@ export default Sentry.wrap(function RootLayout() {
   return (
     <I18nextProvider i18n={i18next}>
       <ToastProvider>
-        <CopilotContextProvider>
-          <ThemeProvider value={DarkTheme}>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="personal-target"
-                options={{ headerShown: false, presentation: "card" }}
-              />
-              <Stack.Screen
-                name="about"
-                options={{ headerShown: false, presentation: "card" }}
-              />
-              <Stack.Screen
-                name="modal"
-                options={{ presentation: "modal", title: "Modal" }}
-              />
-            </Stack>
-            <StatusBar style="light" />
-          </ThemeProvider>
-        </CopilotContextProvider>
+        <OnboardingProvider>
+          <CopilotContextProvider>
+            <ThemeProvider value={DarkTheme}>
+              <RootLayoutContent />
+              <StatusBar style="light" />
+            </ThemeProvider>
+          </CopilotContextProvider>
+        </OnboardingProvider>
       </ToastProvider>
     </I18nextProvider>
   );

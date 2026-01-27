@@ -1,5 +1,6 @@
 import { ScreenWrapper } from "@/components/screen-wrapper";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { useOnboarding } from "@/context/onboarding-context";
 import { resetAllData } from "@/database/operations";
 import { useCopilotTutorial } from "@/hooks/use-copilot-tutorial";
 import {
@@ -16,6 +17,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 export default function SettingsScreen() {
   const router = useRouter();
   const { resetTutorial } = useCopilotTutorial();
+  const { resetOnboarding } = useOnboarding();
   const [isResetVisible, setIsResetVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { t, i18n } = useTranslation();
@@ -36,12 +38,15 @@ export default function SettingsScreen() {
     try {
       resetAllData();
       resetTutorial();
+      resetOnboarding();
       captureMessage("All data reset successfully", {
         level: "info",
         category: "data-operation",
       });
       setIsResetVisible(false);
       setIsDeleting(false);
+      // Navigate to onboarding screen
+      router.replace("/onboarding");
     } catch (error) {
       captureException(error as Error, {
         category: "data-operation",

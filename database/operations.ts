@@ -639,3 +639,84 @@ export const removeAppSetting = (key: string) => {
     }
   }
 };
+// --- User Profile ---
+
+export interface UserProfile {
+  user_id: number;
+  name: string;
+  age: number;
+  gender: string;
+  height_cm: number;
+  goal: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export const createUserProfile = (
+  name: string,
+  age: number,
+  gender: string,
+  heightCm: number,
+  goal: string,
+): number => {
+  try {
+    const now = new Date().toISOString();
+    const statement = db.prepareSync(
+      "INSERT INTO user_profile (name, age, gender, height_cm, goal, created_at, updated_at) VALUES ($name, $age, $gender, $heightCm, $goal, $createdAt, $updatedAt)",
+    );
+    const result = statement.executeSync({
+      $name: name,
+      $age: age,
+      $gender: gender,
+      $heightCm: heightCm,
+      $goal: goal,
+      $createdAt: now,
+      $updatedAt: now,
+    });
+    return result.lastInsertRowId;
+  } catch (error) {
+    console.error("Error creating user profile:", error);
+    throw error;
+  }
+};
+
+export const getUserProfile = (): UserProfile | null => {
+  try {
+    const result = db.getFirstSync(
+      "SELECT * FROM user_profile ORDER BY user_id DESC LIMIT 1",
+    ) as UserProfile | undefined;
+    return result || null;
+  } catch (error) {
+    console.error("Error getting user profile:", error);
+    return null;
+  }
+};
+
+export const updateUserProfile = (
+  userId: number,
+  name: string,
+  age: number,
+  gender: string,
+  heightCm: number,
+  goal: string,
+): boolean => {
+  try {
+    const now = new Date().toISOString();
+    const statement = db.prepareSync(
+      "UPDATE user_profile SET name = $name, age = $age, gender = $gender, height_cm = $heightCm, goal = $goal, updated_at = $updatedAt WHERE user_id = $userId",
+    );
+    statement.executeSync({
+      $name: name,
+      $age: age,
+      $gender: gender,
+      $heightCm: heightCm,
+      $goal: goal,
+      $updatedAt: now,
+      $userId: userId,
+    });
+    return true;
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    return false;
+  }
+};

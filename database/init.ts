@@ -67,6 +67,17 @@ export const initDatabase = () => {
         value TEXT,
         updated_at TEXT
       );
+
+      CREATE TABLE IF NOT EXISTS user_profile (
+        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        age INTEGER,
+        gender TEXT,
+        height_cm REAL,
+        goal TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT
+      );
     `);
 
     // 2. Migration Strategy: Check for missing columns and add them safely
