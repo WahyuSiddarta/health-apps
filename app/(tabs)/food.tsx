@@ -508,8 +508,11 @@ export default function FoodScreen() {
               </Text>
               <View className="gap-3">
                 {weeklyStats.map((stat) => (
-                  <View key={stat.day} className="flex-row items-center">
-                    <Text className="w-8 font-medium text-neutral-400">
+                  <View
+                    key={stat.day}
+                    className="flex-row items-center align-middle"
+                  >
+                    <Text className="w-8 font-medium align-middle text-neutral-400">
                       {stat.day}
                     </Text>
                     <View className="flex-row flex-1 h-6 mx-2 overflow-hidden rounded-full bg-neutral-800">

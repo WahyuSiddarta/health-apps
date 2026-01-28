@@ -217,10 +217,13 @@ export default function ExerciseScreen() {
               <Text className="mb-4 font-bold text-white">
                 {t("pages.exercise.weeklyCalorieBreakdown")}
               </Text>
-              <View className="gap-3">
+              <View className="justify-center gap-3">
                 {weeklyStats.map((stat) => (
-                  <View key={stat.day} className="flex-row items-center">
-                    <Text className="w-8 font-medium text-neutral-400">
+                  <View
+                    key={stat.day}
+                    className="flex flex-row items-center align-middle"
+                  >
+                    <Text className="flex w-8 font-medium text-center align-middle text-neutral-400">
                       {stat.day}
                     </Text>
                     <View className="flex-row flex-1 h-6 mx-2 overflow-hidden rounded-full bg-neutral-800">
