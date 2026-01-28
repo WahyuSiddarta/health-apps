@@ -20,15 +20,22 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(
 
 interface OnboardingProviderProps {
   children: ReactNode;
+  dbReady?: boolean;
 }
 
 export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
   children,
+  dbReady = false,
 }) => {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for database to be ready before checking onboarding status
+    if (!dbReady) {
+      return;
+    }
+
     // Check if user has already completed onboarding
     const checkOnboarding = async () => {
       try {
@@ -44,7 +51,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
       }
     };
 
-    // Call immediately
+    // Call immediately once db is ready
     checkOnboarding();
 
     // Safety timeout in case something hangs
@@ -53,7 +60,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, []);
+  }, [dbReady]);
 
   const handleSetHasCompletedOnboarding = (value: boolean) => {
     console.log("Setting onboarding completed to:", value);

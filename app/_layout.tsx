@@ -82,7 +82,7 @@ function RootLayoutContent() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="personal-target" options={{ presentation: "card" }} />
       <Stack.Screen name="about" options={{ presentation: "card" }} />
       <Stack.Screen name="personal-data" options={{ presentation: "card" }} />
@@ -122,7 +122,7 @@ function RootLayout() {
   return (
     <I18nextProvider i18n={i18next}>
       <ToastProvider>
-        <OnboardingProvider>
+        <OnboardingProvider dbReady={dbInitialized}>
           <CopilotContextProvider>
             <ThemeProvider value={DarkTheme}>
               <RootLayoutContent />
