@@ -246,12 +246,12 @@ export default function DashboardScreen() {
                   {t("pages.dashboard.kg")}
                 </Text>
               </View>
-              {userTarget?.bodyweight && (
+              {userTarget?.bodyweight ? (
                 <Text className="mt-1 text-xs text-neutral-500">
                   {t("pages.dashboard.target")}: {userTarget.bodyweight}{" "}
                   {t("pages.dashboard.kg")}
                 </Text>
-              )}
+              ) : null}
             </View>
             <TouchableOpacity
               onPress={() => router.push("/(tabs)/weight")}

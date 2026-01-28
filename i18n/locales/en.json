@@ -4,7 +4,9 @@
     "settings": {
       "title": "Settings",
       "language": "Language",
+      "personalData": "Personal Data",
       "personalTargets": "Personal Targets",
+      "calorieCalculator": "Calorie Calculator",
       "aboutUs": "About Us",
       "resetAllData": "Reset All Data",
       "resetConfirmationTitle": "Reset All Data",
@@ -12,6 +14,19 @@
       "cancel": "Cancel",
       "delete": "Delete",
       "deleting": "Deleting..."
+    },
+    "personalData": {
+      "title": "Personal Data",
+      "basicInformation": "Basic Information",
+      "name": "Name",
+      "age": "Age",
+      "height": "Height (cm)",
+      "gender": "Gender",
+      "mainGoal": "Main Goal",
+      "saveChanges": "Save Changes",
+      "failedLoadProfile": "Failed to load profile",
+      "failedUpdateProfile": "Failed to update profile",
+      "profileUpdatedSuccess": "Profile updated successfully"
     },
     "personalTarget": {
       "title": "Personal Targets",
@@ -215,7 +230,7 @@
       "other": "Other",
       "height": "What's your height?",
       "heightSubtitle": "In centimeters (cm)",
-      "heightPlaceholder": "e.g., 170",
+      "heightPlaceholder": "e.g., 170 cm",
       "activityLevel": "What's your activity level?",
       "activityLevelSubtitle": "How often do you exercise?",
       "selectYourActivityLevel": "Help us understand your fitness level",

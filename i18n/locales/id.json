@@ -4,7 +4,9 @@
     "settings": {
       "title": "Pengaturan",
       "language": "Bahasa",
+      "personalData": "Data Pribadi",
       "personalTargets": "Target Pribadi",
+      "calorieCalculator": "Kalkulator Kalori",
       "aboutUs": "Tentang Kami",
       "resetAllData": "Reset Semua Data",
       "resetConfirmationTitle": "Reset Semua Data",
@@ -12,6 +14,19 @@
       "cancel": "Batal",
       "delete": "Hapus",
       "deleting": "Menghapus..."
+    },
+    "personalData": {
+      "title": "Data Pribadi",
+      "basicInformation": "Informasi Dasar",
+      "name": "Nama",
+      "age": "Usia",
+      "height": "Tinggi (cm)",
+      "gender": "Jenis Kelamin",
+      "mainGoal": "Tujuan Utama",
+      "saveChanges": "Simpan Perubahan",
+      "failedLoadProfile": "Gagal memuat profil",
+      "failedUpdateProfile": "Gagal memperbarui profil",
+      "profileUpdatedSuccess": "Profil berhasil diperbarui"
     },
     "personalTarget": {
       "title": "Target Pribadi",
@@ -215,7 +230,7 @@
       "other": "Lainnya",
       "height": "Berapa tinggi badan Anda?",
       "heightSubtitle": "Dalam sentimeter (cm)",
-      "heightPlaceholder": "Contoh: 170",
+      "heightPlaceholder": "Contoh: 170 cm",
       "activityLevel": "Berapa tingkat aktivitas Anda?",
       "activityLevelSubtitle": "Berapa sering Anda berolahraga?",
       "selectYourActivityLevel": "Bantu kami memahami tingkat kebugaran Anda",

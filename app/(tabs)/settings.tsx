@@ -95,7 +95,35 @@ export default function SettingsScreen() {
         </View>
 
         <View className="flex-1">
-          <View className="overflow-hidden bg-neutral-900 rounded-xl">
+          <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+            <TouchableOpacity
+              onPress={() => router.push("/personal-data")}
+              className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+            >
+              <View className="flex-row items-center gap-3">
+                <View className="items-center justify-center w-8 h-8 rounded-full bg-purple-500/20">
+                  <Ionicons name="person" size={18} color="#a855f7" />
+                </View>
+                <Text className="font-medium text-white">
+                  {t("pages.settings.personalData")}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#525252" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/calorie-calculator")}
+              className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+            >
+              <View className="flex-row items-center gap-3">
+                <View className="items-center justify-center w-8 h-8 rounded-full bg-orange-500/20">
+                  <Ionicons name="flame" size={18} color="#f97316" />
+                </View>
+                <Text className="font-medium text-white">
+                  {t("pages.settings.calorieCalculator")}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#525252" />
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/personal-target")}
               className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"

@@ -12,6 +12,7 @@ interface SegmentedControlProps {
   onChange: (value: string) => void;
   label?: string;
   className?: string;
+  itemsPerRow?: number; // how many options per row, default 3
 }
 
 function SegmentedControlRow({
@@ -86,10 +87,11 @@ export function SegmentedControl({
   onChange,
   label,
   className,
+  itemsPerRow = 3,
 }: SegmentedControlProps) {
   const rows = [];
-  for (let i = 0; i < options.length; i += 3) {
-    rows.push(options.slice(i, i + 3));
+  for (let i = 0; i < options.length; i += itemsPerRow) {
+    rows.push(options.slice(i, i + itemsPerRow));
   }
 
   return (

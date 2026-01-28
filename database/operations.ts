@@ -575,6 +575,7 @@ export const resetAllData = () => {
     db().execSync("DELETE FROM food");
     db().execSync("DELETE FROM weight");
     db().execSync("DELETE FROM user_targets");
+    db().execSync("DELETE FROM user_profile");
     // Reset tutorial status
     setAppSetting("tutorial_completed", "false");
   } catch (error) {
@@ -582,8 +583,6 @@ export const resetAllData = () => {
     throw error;
   }
 };
-
-// --- App Settings ---
 
 export const setAppSetting = (key: string, value: string) => {
   let statement;
@@ -648,9 +647,9 @@ export interface UserProfile {
   user_id: number;
   name: string;
   age: number;
-  gender: string;
+  gender: "male" | "female";
   height_cm: number;
-  goal: string;
+  goal: "weight_loss" | "weight_gain" | "maintain";
   created_at: string;
   updated_at: string;
 }
@@ -658,23 +657,22 @@ export interface UserProfile {
 export const createUserProfile = (
   name: string,
   age: number,
-  gender: string,
-  heightCm: number,
-  goal: string,
-): number => {
+  gender: "male" | "female",
+  height: number,
+  goal: "weight_loss" | "weight_gain" | "maintain",
+) => {
   try {
     const now = new Date().toISOString();
     const statement = db().prepareSync(
-      "INSERT INTO user_profile (name, age, gender, height_cm, goal, created_at, updated_at) VALUES ($name, $age, $gender, $heightCm, $goal, $createdAt, $updatedAt)",
+      "INSERT INTO user_profile (name, age, gender, height_cm, goal, created_at, updated_at) VALUES ($name, $age, $gender, $height_cm, $goal, $now, $now)",
     );
     const result = statement.executeSync({
       $name: name,
       $age: age,
       $gender: gender,
-      $heightCm: heightCm,
+      $height_cm: height,
       $goal: goal,
-      $createdAt: now,
-      $updatedAt: now,
+      $now: now,
     });
     return result.lastInsertRowId;
   } catch (error) {
@@ -685,10 +683,10 @@ export const createUserProfile = (
 
 export const getUserProfile = (): UserProfile | null => {
   try {
-    const result = db().getFirstSync(
-      "SELECT * FROM user_profile ORDER BY user_id DESC LIMIT 1",
-    ) as UserProfile | undefined;
-    return result || null;
+    const statement = db().prepareSync("SELECT * FROM user_profile LIMIT 1");
+    const result = statement.executeSync();
+    const row = result.getFirstSync();
+    return row as UserProfile | null;
   } catch (error) {
     console.error("Error getting user profile:", error);
     return null;
@@ -697,30 +695,49 @@ export const getUserProfile = (): UserProfile | null => {
 
 export const updateUserProfile = (
   userId: number,
-  name: string,
-  age: number,
-  gender: string,
-  heightCm: number,
-  goal: string,
-): boolean => {
+  data: Partial<Omit<UserProfile, "user_id" | "created_at" | "updated_at">>,
+) => {
+  let statement;
   try {
     const now = new Date().toISOString();
-    const statement = db().prepareSync(
-      "UPDATE user_profile SET name = $name, age = $age, gender = $gender, height_cm = $heightCm, goal = $goal, updated_at = $updatedAt WHERE user_id = $userId",
-    );
-    statement.executeSync({
-      $name: name,
-      $age: age,
-      $gender: gender,
-      $heightCm: heightCm,
-      $goal: goal,
-      $updatedAt: now,
-      $userId: userId,
-    });
-    return true;
+
+    const setClauses: string[] = [];
+    const params: any = { $userId: userId, $now: now };
+
+    if (data.name !== undefined) {
+      setClauses.push("name = $name");
+      params.$name = data.name;
+    }
+    if (data.age !== undefined) {
+      setClauses.push("age = $age");
+      params.$age = data.age;
+    }
+    if (data.gender !== undefined) {
+      setClauses.push("gender = $gender");
+      params.$gender = data.gender;
+    }
+    if (data.height_cm !== undefined) {
+      setClauses.push("height_cm = $height_cm");
+      params.$height_cm = data.height_cm;
+    }
+    if (data.goal !== undefined) {
+      setClauses.push("goal = $goal");
+      params.$goal = data.goal;
+    }
+
+    // Always update the timestamp
+    setClauses.push("updated_at = $now");
+
+    const sql = `UPDATE user_profile SET ${setClauses.join(", ")} WHERE user_id = $userId`;
+    statement = db().prepareSync(sql);
+    statement.executeSync(params);
   } catch (error) {
     console.error("Error updating user profile:", error);
-    return false;
+    throw error;
+  } finally {
+    if (statement) {
+      statement.finalizeSync();
+    }
   }
 };
 

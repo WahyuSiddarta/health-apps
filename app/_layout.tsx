@@ -71,6 +71,12 @@ function RootLayoutContent() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="personal-target" options={{ presentation: "card" }} />
       <Stack.Screen name="about" options={{ presentation: "card" }} />
+      <Stack.Screen name="personal-data" options={{ presentation: "card" }} />
+      <Stack.Screen
+        name="calorie-calculator"
+        options={{ presentation: "card" }}
+      />
+
       <Stack.Screen
         name="modal"
         options={{ presentation: "modal", title: "Modal" }}
