@@ -67,16 +67,10 @@ function RootLayoutContent() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="personal-target"
-        options={{ headerShown: false, presentation: "card" }}
-      />
-      <Stack.Screen
-        name="about"
-        options={{ headerShown: false, presentation: "card" }}
-      />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="personal-target" options={{ presentation: "card" }} />
+      <Stack.Screen name="about" options={{ presentation: "card" }} />
       <Stack.Screen
         name="modal"
         options={{ presentation: "modal", title: "Modal" }}

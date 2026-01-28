@@ -53,3 +53,4 @@ app-example
 /android
 
 .env.local
+codepush.txt
