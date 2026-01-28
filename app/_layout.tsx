@@ -5,17 +5,24 @@ import {
 } from "@/context/onboarding-context";
 import { ToastProvider } from "@/context/toast-context";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
-import codePush from "@revopush/react-native-code-push";
 import * as Sentry from "@sentry/react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { ComponentType, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 import "react-native-reanimated";
 import { initDatabase } from "../database/init";
 import i18next from "../i18n";
 import "./index.css";
+
+// CodePush wrapper - returns identity function if native module not available
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const codePushModule = require("@revopush/react-native-code-push");
+const codePush: <T extends ComponentType<object>>(component: T) => T =
+  typeof codePushModule === "function"
+    ? codePushModule
+    : (component: ComponentType<object>) => component;
 
 Sentry.init({
   dsn: "https://dbdd398c56c4a1ed5fe33d520206907b@o4510388552204288.ingest.us.sentry.io/4510762955767808",
@@ -79,12 +86,24 @@ function RootLayoutContent() {
 }
 
 function RootLayout() {
+  const [dbInitialized, setDbInitialized] = useState(false);
+
   useEffect(() => {
-    initDatabase().catch((error) => {
-      console.error("Failed to initialize database:", error);
-      Sentry.captureException(error);
-    });
+    initDatabase()
+      .then(() => setDbInitialized(true))
+      .catch((error) => {
+        console.error("Failed to initialize database:", error);
+        Sentry.captureException(error);
+      });
   }, []);
+
+  if (!dbInitialized) {
+    return (
+      <View className="items-center justify-center flex-1 bg-gray-950">
+        <ActivityIndicator size="large" color="#10b981" />
+      </View>
+    );
+  }
 
   return (
     <I18nextProvider i18n={i18next}>
@@ -102,4 +121,4 @@ function RootLayout() {
   );
 }
 
-export default codePush(Sentry.wrap(RootLayout));
+export default Sentry.wrap(codePush(RootLayout));
