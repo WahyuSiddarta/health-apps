@@ -140,13 +140,43 @@ export default function FoodScreen() {
     if (filter !== "Weekly") return [];
 
     const stats = [
-      { day: "Mon", total: 0, breakdown: {} as Record<string, number> },
-      { day: "Tue", total: 0, breakdown: {} as Record<string, number> },
-      { day: "Wed", total: 0, breakdown: {} as Record<string, number> },
-      { day: "Thu", total: 0, breakdown: {} as Record<string, number> },
-      { day: "Fri", total: 0, breakdown: {} as Record<string, number> },
-      { day: "Sat", total: 0, breakdown: {} as Record<string, number> },
-      { day: "Sun", total: 0, breakdown: {} as Record<string, number> },
+      {
+        day: t("day.monday").substring(0, 3),
+        total: 0,
+        breakdown: {} as Record<string, number>,
+      },
+      {
+        day: t("day.tuesday").substring(0, 3),
+        total: 0,
+        breakdown: {} as Record<string, number>,
+      },
+      {
+        day: t("day.wednesday").substring(0, 3),
+
+        total: 0,
+        breakdown: {} as Record<string, number>,
+      },
+      {
+        day: t("day.thursday").substring(0, 3),
+
+        total: 0,
+        breakdown: {} as Record<string, number>,
+      },
+      {
+        day: t("day.friday").substring(0, 3),
+        total: 0,
+        breakdown: {} as Record<string, number>,
+      },
+      {
+        day: t("day.saturday").substring(0, 3),
+        total: 0,
+        breakdown: {} as Record<string, number>,
+      },
+      {
+        day: t("day.sunday").substring(0, 3),
+        total: 0,
+        breakdown: {} as Record<string, number>,
+      },
     ];
 
     foodLogs.forEach((food) => {
@@ -512,7 +542,7 @@ export default function FoodScreen() {
                     key={stat.day}
                     className="flex-row items-center align-middle"
                   >
-                    <Text className="w-8 font-medium align-middle text-neutral-400">
+                    <Text className="w-10 font-medium align-middle text-neutral-400">
                       {stat.day}
                     </Text>
                     <View className="flex-row flex-1 h-6 mx-2 overflow-hidden rounded-full bg-neutral-800">

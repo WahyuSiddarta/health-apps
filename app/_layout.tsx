@@ -16,13 +16,27 @@ import { initDatabase } from "../database/init";
 import i18next from "../i18n";
 import "./index.css";
 
-// CodePush wrapper - returns identity function if native module not available
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const codePushModule = require("@revopush/react-native-code-push");
-const codePush: <T extends ComponentType<object>>(component: T) => T =
-  typeof codePushModule === "function"
-    ? codePushModule
-    : (component: ComponentType<object>) => component;
+// CodePush wrapper - safely handles absence or different export shapes
+type CodePushOptions = {
+  checkFrequency?: number;
+  installMode?: number;
+};
+
+type CodePushType = ((
+  options?: CodePushOptions,
+) => <T extends ComponentType<object>>(component: T) => T) & {
+  CheckFrequency: { ON_APP_RESUME: number };
+  InstallMode: { ON_NEXT_RESUME: number };
+};
+
+let codePushModule: CodePushType | null = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mod = require("@revopush/react-native-code-push");
+  codePushModule = (mod?.default ?? mod) as CodePushType;
+} catch {
+  codePushModule = null;
+}
 
 Sentry.init({
   dsn: "https://dbdd398c56c4a1ed5fe33d520206907b@o4510388552204288.ingest.us.sentry.io/4510762955767808",
@@ -121,4 +135,11 @@ function RootLayout() {
   );
 }
 
-export default Sentry.wrap(codePush(RootLayout));
+const WrappedRootLayout = codePushModule
+  ? codePushModule({
+      checkFrequency: codePushModule.CheckFrequency.ON_APP_RESUME,
+      installMode: codePushModule.InstallMode.ON_NEXT_RESUME,
+    })(RootLayout)
+  : RootLayout;
+
+export default Sentry.wrap(WrappedRootLayout);

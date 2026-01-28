@@ -13,7 +13,13 @@
       "resetConfirmationMessage": "Apakah Anda yakin ingin menghapus semua data Anda? Tindakan ini tidak dapat dibatalkan.",
       "cancel": "Batal",
       "delete": "Hapus",
-      "deleting": "Menghapus..."
+      "deleting": "Menghapus...",
+      "sections": {
+        "language": "Bahasa",
+        "healthGoals": "Tujuan Kesehatan",
+        "about": "Tentang",
+        "dangerZone": "Zona Bahaya"
+      }
     },
     "personalData": {
       "title": "Data Pribadi",
@@ -186,7 +192,7 @@
       "calculatedAutomatically": "Dihitung otomatis"
     },
     "dashboard": {
-      "title": "Dasbor",
+      "title": "Dasbord",
       "startTutorial": "Mulai Tutorial",
       "caloriesTitle": "Kalori Hari Ini",
       "target": "Target",
@@ -267,5 +273,14 @@
       "targetCaloriesGainDesc": "Makan di atas ini akan membantu Anda menaikkan berat badan",
       "targetCaloriesMaintainDesc": "Makan pada level ini akan membantu Anda mempertahankan berat badan saat ini"
     }
+  },
+  "day": {
+    "monday": "Senin",
+    "tuesday": "Selasa",
+    "wednesday": "Rabu",
+    "thursday": "Kamis",
+    "friday": "Jumat",
+    "saturday": "Sabtu",
+    "sunday": "Minggu"
   }
 }

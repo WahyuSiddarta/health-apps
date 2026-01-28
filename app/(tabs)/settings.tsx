@@ -3,12 +3,14 @@ import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { useOnboarding } from "@/context/onboarding-context";
 import { resetAllData } from "@/database/operations";
 import { useCopilotTutorial } from "@/hooks/use-copilot-tutorial";
+import { LANGUAGE_STORAGE_KEY } from "@/i18n";
 import {
   addBreadcrumb,
   captureException,
   captureMessage,
 } from "@/utils/error-handler";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,8 +24,14 @@ export default function SettingsScreen() {
   const [isDeleting, setIsDeleting] = useState(false);
   const { t, i18n } = useTranslation();
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const changeLanguage = async (lng: string) => {
+    try {
+      await i18n.changeLanguage(lng);
+      await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, lng);
+    } catch (e) {
+      // ignore storage errors; i18n will still update in-memory
+      console.warn("Failed to persist language selection", e);
+    }
   };
 
   const handleResetData = () => {
@@ -61,7 +69,12 @@ export default function SettingsScreen() {
   return (
     <ScreenWrapper title={t("pages.settings.title")}>
       <View className="flex-1 p-4">
-        <View className="mb-4 overflow-hidden bg-neutral-900 rounded-xl">
+        <View className="px-1 mb-2">
+          <Text className="text-xs font-semibold uppercase text-neutral-400">
+            {t("pages.settings.sections.language")}
+          </Text>
+        </View>
+        <View className="overflow-hidden bg-neutral-900 rounded-xl">
           <View className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800">
             <View className="flex-row items-center gap-3">
               <View className="items-center justify-center w-8 h-8 rounded-full bg-blue-500/20">
@@ -95,7 +108,12 @@ export default function SettingsScreen() {
         </View>
 
         <View className="flex-1">
-          <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+          <View className="px-1 mt-6 mb-2">
+            <Text className="text-xs font-semibold uppercase text-neutral-400">
+              {t("pages.settings.sections.healthGoals")}
+            </Text>
+          </View>
+          <View className="overflow-hidden bg-neutral-900 rounded-xl">
             <TouchableOpacity
               onPress={() => router.push("/personal-data")}
               className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
@@ -106,20 +124,6 @@ export default function SettingsScreen() {
                 </View>
                 <Text className="font-medium text-white">
                   {t("pages.settings.personalData")}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#525252" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => router.push("/calorie-calculator")}
-              className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
-            >
-              <View className="flex-row items-center gap-3">
-                <View className="items-center justify-center w-8 h-8 rounded-full bg-orange-500/20">
-                  <Ionicons name="flame" size={18} color="#f97316" />
-                </View>
-                <Text className="font-medium text-white">
-                  {t("pages.settings.calorieCalculator")}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#525252" />
@@ -138,9 +142,28 @@ export default function SettingsScreen() {
               </View>
               <Ionicons name="chevron-forward" size={20} color="#525252" />
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/calorie-calculator")}
+              className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
+            >
+              <View className="flex-row items-center gap-3">
+                <View className="items-center justify-center w-8 h-8 rounded-full bg-orange-500/20">
+                  <Ionicons name="flame" size={18} color="#f97316" />
+                </View>
+                <Text className="font-medium text-white">
+                  {t("pages.settings.calorieCalculator")}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#525252" />
+            </TouchableOpacity>
           </View>
 
-          <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+          <View className="px-1 mt-6 mb-2">
+            <Text className="text-xs font-semibold uppercase text-neutral-400">
+              {t("pages.settings.sections.about")}
+            </Text>
+          </View>
+          <View className="overflow-hidden bg-neutral-900 rounded-xl">
             <TouchableOpacity
               onPress={() => router.push("/about")}
               className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"
@@ -161,7 +184,12 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
 
-          <View className="mt-4 overflow-hidden bg-neutral-900 rounded-xl">
+          <View className="px-1 mt-6 mb-2">
+            <Text className="text-xs font-semibold uppercase text-neutral-400">
+              {t("pages.settings.sections.dangerZone")}
+            </Text>
+          </View>
+          <View className="overflow-hidden bg-neutral-900 rounded-xl">
             <TouchableOpacity
               onPress={handleResetData}
               className="flex-row items-center justify-between p-4 border-b bg-neutral-900 border-neutral-800"

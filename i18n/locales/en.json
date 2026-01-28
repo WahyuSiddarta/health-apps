@@ -13,7 +13,13 @@
       "resetConfirmationMessage": "Are you sure you want to delete all your data? This action cannot be undone.",
       "cancel": "Cancel",
       "delete": "Delete",
-      "deleting": "Deleting..."
+      "deleting": "Deleting...",
+      "sections": {
+        "language": "Language",
+        "healthGoals": "Health Goals",
+        "about": "About",
+        "dangerZone": "Danger Zone"
+      }
     },
     "personalData": {
       "title": "Personal Data",
@@ -267,5 +273,14 @@
       "targetCaloriesGainDesc": "Eating above this will help you gain weight",
       "targetCaloriesMaintainDesc": "Eating at this level will help you maintain your current weight"
     }
+  },
+  "day": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
   }
 }
