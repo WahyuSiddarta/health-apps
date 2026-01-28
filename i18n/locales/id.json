@@ -203,6 +203,8 @@
       "name": "Kami memanggil Anda siapa?",
       "nameSubtitle": "tidak harus memakai nama asli, dapat menggunakan nama panggilan / samaran",
       "namePlaceholder": "Masukkan nama Anda",
+      "personalInfo": "Ceritakan lebih banyak tentang diri Anda",
+      "personalInfoSubtitle": "Ini membantu kami menghitung kebutuhan kalori harian Anda",
       "age": "Berapa umur Anda?",
       "ageSubtitle": "Bantu kami memahami demografi Anda",
       "agePlaceholder": "Masukkan umur Anda",
@@ -216,6 +218,7 @@
       "heightPlaceholder": "Contoh: 170",
       "activityLevel": "Berapa tingkat aktivitas Anda?",
       "activityLevelSubtitle": "Berapa sering Anda berolahraga?",
+      "selectYourActivityLevel": "Bantu kami memahami tingkat kebugaran Anda",
       "sedentary": "Sedentari",
       "sedentaryDesc": "Sedikit atau tidak ada olahraga",
       "lightlyActive": "Aktif Ringan",
@@ -237,7 +240,17 @@
       "missingInformation": "Informasi Kurang",
       "fillAllFields": "Silakan isi semua bidang",
       "error": "Kesalahan",
-      "failedSaveProfile": "Gagal menyimpan profil Anda. Silakan coba lagi."
+      "failedSaveProfile": "Gagal menyimpan profil Anda. Silakan coba lagi.",
+      "weight": "Berat Badan",
+      "weightPlaceholder": "Contoh: 75",
+      "basalMetabolicRate": "Kebutuhan Kalori Dasar (BMR)",
+      "bmrDescription": "Kalori yang Anda butuhkan setiap hari untuk mempertahankan berat badan saat ini, tanpa menghitung aktivitas fisik",
+      "dailyCaloriesWithActivity": "Kalori Harian dengan Aktivitas (TDEE)",
+      "caloriesWithActivityDesc": "Total kalori yang Anda bakar setiap hari termasuk tingkat aktivitas Anda",
+      "targetDailyCalories": "Target Kalori Harian Anda",
+      "targetCaloriesLossDesc": "Makan di bawah ini akan membantu Anda menurunkan berat badan",
+      "targetCaloriesGainDesc": "Makan di atas ini akan membantu Anda menaikkan berat badan",
+      "targetCaloriesMaintainDesc": "Makan pada level ini akan membantu Anda mempertahankan berat badan saat ini"
     }
   }
 }

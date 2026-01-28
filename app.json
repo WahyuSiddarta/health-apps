@@ -4,13 +4,14 @@
     "slug": "bugarin",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/images/logo_new.svg",
+    "icon": "./assets/images/adaptive_icon_foreground_512.png",
     "scheme": "bugarin",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.bugarin"
+      "bundleIdentifier": "com.anonymous.bugarin",
+      "deploymentTarget": "15.5"
     },
     "android": {
       "adaptiveIcon": {
@@ -42,13 +43,32 @@
           }
         }
       ],
-      "expo-sqlite",
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true
+        }
+      ],
       [
         "@sentry/react-native/expo",
         {
           "url": "https://sentry.io/",
           "project": "react-native",
           "organization": "personal-2i3"
+        }
+      ],
+      [
+        "@revopush/expo-code-push-plugin",
+        {
+          "ios": {
+            "CodePushDeploymentKey": "ma64ruk3sAGdYQNKhM_btwaMrWMuV1793obU7g",
+            "CodePushServerUrl": "https://api.revopush.org"
+          },
+          "android": {
+            "CodePushDeploymentKey": "ma64ruk3sAGdYQNKhM_btwaMrWMuV1793obU7g",
+            "CodePushServerUrl": "https://api.revopush.org"
+          }
         }
       ]
     ],

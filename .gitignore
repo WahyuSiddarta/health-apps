@@ -38,6 +38,11 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Keystore backup
+*.keystore.backup
+release.keystore.backup
+local.properties.backup
+
 # typescript
 *.tsbuildinfo
 

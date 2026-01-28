@@ -3,6 +3,7 @@ import { InputField } from "@/components/ui/input-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { useToast } from "@/context/toast-context";
 import {
+  getUserProfile,
   getUserTarget,
   initializeUserTarget,
   updatePersonalBodyMeasurementTarget,
@@ -29,6 +30,7 @@ export default function PersonalTargetScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(1);
   const [target, setTarget] = useState<UserTarget | null>(null);
 
   // Form State
@@ -63,10 +65,15 @@ export default function PersonalTargetScreen() {
   const loadData = () => {
     try {
       setLoading(true);
-      let data = getUserTarget();
+      // Get the current user profile to get the user_id
+      const userProfile = getUserProfile();
+      const currentUserId = userProfile?.user_id || 1;
+      setUserId(currentUserId);
+
+      let data = getUserTarget(currentUserId);
       if (!data) {
-        initializeUserTarget();
-        data = getUserTarget();
+        initializeUserTarget(currentUserId);
+        data = getUserTarget(currentUserId);
       }
 
       if (data) {
@@ -102,8 +109,6 @@ export default function PersonalTargetScreen() {
 
   const handleSave = () => {
     try {
-      const userId = 1; // Default user ID
-
       // Update Nutrition
       updatePersonalNutritionTarget(
         userId,

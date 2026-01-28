@@ -5,6 +5,7 @@ import {
   FoodRecord,
   getExercises,
   getFood,
+  getUserProfile,
   getUserTarget,
   getWeightLogs,
   UserTarget,
@@ -47,8 +48,12 @@ export default function DashboardScreen() {
     const weightLogs = getWeightLogs();
     setLatestWeight(weightLogs.length > 0 ? weightLogs[0] : null);
 
-    const target = getUserTarget();
-    setUserTarget(target);
+    // Get the current user profile to get the user_id, then fetch targets
+    const userProfile = getUserProfile();
+    if (userProfile) {
+      const target = getUserTarget(userProfile.user_id);
+      setUserTarget(target);
+    }
   }, []);
 
   // Auto-start tutorial for first-time users (only once)

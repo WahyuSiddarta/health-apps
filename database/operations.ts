@@ -1,5 +1,8 @@
 import { addBreadcrumb, captureDatabaseError } from "@/utils/error-handler";
-import db from "./db";
+import { getDatabase } from "./db";
+
+// Helper to get database instance
+const db = () => getDatabase();
 
 // --- Exercises ---
 
@@ -27,7 +30,7 @@ export const addExercise = (
       category: "data",
       data: { name, intensity, type },
     });
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "INSERT INTO exercises (name, record_at, minute, caloric, intensity, type) VALUES ($name, $recordAt, $minute, $caloric, $intensity, $type)",
     );
     const result = statement.executeSync({
@@ -87,7 +90,7 @@ export const getExercises = (filters?: {
 
     query += " ORDER BY record_at DESC";
 
-    return db.getAllSync(query, params) as ExerciseRecord[];
+    return db().getAllSync(query, params) as ExerciseRecord[];
   } catch (error) {
     console.error("Error getting exercises:", error);
     return [];
@@ -96,7 +99,7 @@ export const getExercises = (filters?: {
 
 export const deleteExercise = (id: number) => {
   try {
-    const statement = db.prepareSync("DELETE FROM exercises WHERE id = $id");
+    const statement = db().prepareSync("DELETE FROM exercises WHERE id = $id");
     statement.executeSync({ $id: id });
   } catch (error) {
     console.error("Error deleting exercise:", error);
@@ -113,7 +116,7 @@ export const updateExercise = (
   type: string,
 ) => {
   try {
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "UPDATE exercises SET name = $name, minute = $minute, caloric = $caloric, intensity = $intensity, type = $type WHERE id = $id",
     );
     statement.executeSync({
@@ -159,7 +162,7 @@ export const addFood = (
   name: string,
 ) => {
   try {
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "INSERT INTO food (user_id, food_id, category, created_at, fat, protein, carbohydrate, caloric, sugar, name) VALUES ($userId, $foodId, $category, $createdAt, $fat, $protein, $carbohydrate, $caloric, $sugar, $name)",
     );
     const result = statement.executeSync({
@@ -210,7 +213,7 @@ export const getFood = (filters?: {
 
     query += " ORDER BY created_at DESC";
 
-    return db.getAllSync(query, params) as FoodRecord[];
+    return db().getAllSync(query, params) as FoodRecord[];
   } catch (error) {
     console.error("Error getting food logs:", error);
     return [];
@@ -219,7 +222,7 @@ export const getFood = (filters?: {
 
 export const deleteFood = (id: number) => {
   try {
-    const statement = db.prepareSync("DELETE FROM food WHERE id = $id");
+    const statement = db().prepareSync("DELETE FROM food WHERE id = $id");
     statement.executeSync({ $id: id });
   } catch (error) {
     console.error("Error deleting food:", error);
@@ -241,7 +244,7 @@ export const updateFood = (
   name: string,
 ) => {
   try {
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "UPDATE food SET user_id = $userId, food_id = $foodId, category = $category, created_at = $createdAt, fat = $fat, protein = $protein, carbohydrate = $carbohydrate, caloric = $caloric, sugar = $sugar, name = $name WHERE id = $id",
     );
     statement.executeSync({
@@ -286,7 +289,7 @@ export const addWeight = (
   measuredAt: string,
 ) => {
   try {
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "INSERT INTO weight (user_id, bodyweight, viceral_fat, fat_percentage, nick_cm, waist_cm, measured_at) VALUES ($userId, $bodyweight, $viceralFat, $fatPercentage, $nickCm, $waistCm, $measuredAt)",
     );
     const result = statement.executeSync({
@@ -328,7 +331,7 @@ export const getWeightLogs = (filters?: {
 
     query += " ORDER BY measured_at DESC";
 
-    return db.getAllSync(query, params) as WeightRecord[];
+    return db().getAllSync(query, params) as WeightRecord[];
   } catch (error) {
     console.error("Error getting weight logs:", error);
     return [];
@@ -346,7 +349,7 @@ export const updateWeight = (
   measuredAt: string,
 ) => {
   try {
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "UPDATE weight SET user_id = $userId, bodyweight = $bodyweight, viceral_fat = $viceralFat, fat_percentage = $fatPercentage, nick_cm = $nickCm, waist_cm = $waistCm, measured_at = $measuredAt WHERE id = $id",
     );
     statement.executeSync({
@@ -367,7 +370,7 @@ export const updateWeight = (
 
 export const deleteWeight = (id: number) => {
   try {
-    const statement = db.prepareSync("DELETE FROM weight WHERE id = $id");
+    const statement = db().prepareSync("DELETE FROM weight WHERE id = $id");
     statement.executeSync({ $id: id });
   } catch (error) {
     console.error("Error deleting weight:", error);
@@ -399,7 +402,7 @@ export interface UserTarget {
 export const getUserTarget = (userId: number = 1): UserTarget | null => {
   let statement;
   try {
-    statement = db.prepareSync(
+    statement = db().prepareSync(
       "SELECT * FROM user_targets WHERE user_id = $userId",
     );
     const result = statement.executeSync({ $userId: userId });
@@ -420,7 +423,7 @@ export const initializeUserTarget = (userId: number = 1) => {
   try {
     const existing = getUserTarget(userId);
     if (!existing) {
-      statement = db.prepareSync(`
+      statement = db().prepareSync(`
                 INSERT INTO user_targets (user_id, nutrition_caloric, nutrition_protein, nutrition_carbohydrate, nutrition_fat, nutrition_sugar, bodyweight, viceral_fat, fat_percentage, weekly_exercise_minutes, weekly_exercise_sessions, weekly_exercise_caloric, weekly_weight_lifting_sessions, weekly_cardio_minutes, weight_goal)
                 VALUES ($userId, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'weight_loss')
             `);
@@ -445,7 +448,7 @@ export const updatePersonalNutritionTarget = (
 ) => {
   let statement;
   try {
-    statement = db.prepareSync(`
+    statement = db().prepareSync(`
       UPDATE user_targets SET 
       nutrition_caloric = $caloric, 
       nutrition_protein = $protein, 
@@ -480,7 +483,7 @@ export const updatePersonalBodyMeasurementTarget = (
 ) => {
   let statement;
   try {
-    statement = db.prepareSync(`
+    statement = db().prepareSync(`
       UPDATE user_targets SET 
       bodyweight = $bodyweight, 
       viceral_fat = $viceralFat, 
@@ -513,7 +516,7 @@ export const updatePersonalExerciseTarget = (
 ) => {
   let statement;
   try {
-    statement = db.prepareSync(`
+    statement = db().prepareSync(`
       UPDATE user_targets SET 
       weekly_exercise_minutes = $minutes, 
       weekly_exercise_sessions = $sessions, 
@@ -546,7 +549,7 @@ export const updatePersonalWeightGoal = (
 ) => {
   let statement;
   try {
-    statement = db.prepareSync(`
+    statement = db().prepareSync(`
       UPDATE user_targets SET 
       weight_goal = $weightGoal
       WHERE user_id = $userId
@@ -568,10 +571,10 @@ export const updatePersonalWeightGoal = (
 export const resetAllData = () => {
   try {
     addBreadcrumb("Resetting all database data", { category: "data" });
-    db.execSync("DELETE FROM exercises");
-    db.execSync("DELETE FROM food");
-    db.execSync("DELETE FROM weight");
-    db.execSync("DELETE FROM user_targets");
+    db().execSync("DELETE FROM exercises");
+    db().execSync("DELETE FROM food");
+    db().execSync("DELETE FROM weight");
+    db().execSync("DELETE FROM user_targets");
     // Reset tutorial status
     setAppSetting("tutorial_completed", "false");
   } catch (error) {
@@ -586,7 +589,7 @@ export const setAppSetting = (key: string, value: string) => {
   let statement;
   try {
     const now = new Date().toISOString();
-    statement = db.prepareSync(
+    statement = db().prepareSync(
       "INSERT OR REPLACE INTO app_settings (key, value, updated_at) VALUES ($key, $value, $updated_at)",
     );
     statement.executeSync({
@@ -607,7 +610,7 @@ export const setAppSetting = (key: string, value: string) => {
 export const getAppSetting = (key: string): string | null => {
   let statement;
   try {
-    statement = db.prepareSync(
+    statement = db().prepareSync(
       "SELECT value FROM app_settings WHERE key = $key",
     );
     const result = statement.executeSync({ $key: key });
@@ -628,7 +631,7 @@ export const getAppSetting = (key: string): string | null => {
 export const removeAppSetting = (key: string) => {
   let statement;
   try {
-    statement = db.prepareSync("DELETE FROM app_settings WHERE key = $key");
+    statement = db().prepareSync("DELETE FROM app_settings WHERE key = $key");
     statement.executeSync({ $key: key });
     console.log("Removed app setting:", key);
   } catch (error) {
@@ -661,7 +664,7 @@ export const createUserProfile = (
 ): number => {
   try {
     const now = new Date().toISOString();
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "INSERT INTO user_profile (name, age, gender, height_cm, goal, created_at, updated_at) VALUES ($name, $age, $gender, $heightCm, $goal, $createdAt, $updatedAt)",
     );
     const result = statement.executeSync({
@@ -682,7 +685,7 @@ export const createUserProfile = (
 
 export const getUserProfile = (): UserProfile | null => {
   try {
-    const result = db.getFirstSync(
+    const result = db().getFirstSync(
       "SELECT * FROM user_profile ORDER BY user_id DESC LIMIT 1",
     ) as UserProfile | undefined;
     return result || null;
@@ -702,7 +705,7 @@ export const updateUserProfile = (
 ): boolean => {
   try {
     const now = new Date().toISOString();
-    const statement = db.prepareSync(
+    const statement = db().prepareSync(
       "UPDATE user_profile SET name = $name, age = $age, gender = $gender, height_cm = $heightCm, goal = $goal, updated_at = $updatedAt WHERE user_id = $userId",
     );
     statement.executeSync({

@@ -5,6 +5,7 @@ import {
 } from "@/context/onboarding-context";
 import { ToastProvider } from "@/context/toast-context";
 import { DarkTheme, ThemeProvider } from "@react-navigation/native";
+import codePush from "@revopush/react-native-code-push";
 import * as Sentry from "@sentry/react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -77,9 +78,12 @@ function RootLayoutContent() {
   );
 }
 
-export default Sentry.wrap(function RootLayout() {
+function RootLayout() {
   useEffect(() => {
-    initDatabase();
+    initDatabase().catch((error) => {
+      console.error("Failed to initialize database:", error);
+      Sentry.captureException(error);
+    });
   }, []);
 
   return (
@@ -96,4 +100,6 @@ export default Sentry.wrap(function RootLayout() {
       </ToastProvider>
     </I18nextProvider>
   );
-});
+}
+
+export default codePush(Sentry.wrap(RootLayout));

@@ -1,7 +1,12 @@
-import db from "./db";
+import * as SQLite from "expo-sqlite";
+import { getDatabase, initializeDatabase } from "./db";
 
-export const initDatabase = () => {
+export const initDatabase = async (): Promise<void> => {
   try {
+    // Initialize the encrypted database first
+    await initializeDatabase();
+    const db = getDatabase();
+
     db.execSync("PRAGMA journal_mode = WAL;");
 
     // 1. Create tables if they don't exist
@@ -81,10 +86,10 @@ export const initDatabase = () => {
     `);
 
     // 2. Migration Strategy: Check for missing columns and add them safely
-    migrateExercisesTable();
-    migrateFoodTable();
-    migrateWeightTable();
-    migrateUserTargetsTable();
+    migrateExercisesTable(db);
+    migrateFoodTable(db);
+    migrateWeightTable(db);
+    migrateUserTargetsTable(db);
 
     console.log("Database initialized successfully");
   } catch (error) {
@@ -92,7 +97,7 @@ export const initDatabase = () => {
   }
 };
 
-const migrateUserTargetsTable = () => {
+const migrateUserTargetsTable = (db: SQLite.SQLiteDatabase) => {
   try {
     const tableInfo = db.getAllSync("PRAGMA table_info(user_targets)") as {
       name: string;
@@ -115,7 +120,7 @@ const migrateUserTargetsTable = () => {
   }
 };
 
-const migrateWeightTable = () => {
+const migrateWeightTable = (db: SQLite.SQLiteDatabase) => {
   try {
     const tableInfo = db.getAllSync("PRAGMA table_info(weight)") as {
       name: string;
@@ -183,7 +188,7 @@ const migrateWeightTable = () => {
   }
 };
 
-const migrateExercisesTable = () => {
+const migrateExercisesTable = (db: SQLite.SQLiteDatabase) => {
   try {
     const tableInfo = db.getAllSync("PRAGMA table_info(exercises)") as {
       name: string;
@@ -235,7 +240,7 @@ const migrateExercisesTable = () => {
   }
 };
 
-const migrateFoodTable = () => {
+const migrateFoodTable = (db: SQLite.SQLiteDatabase) => {
   try {
     const tableInfo = db.getAllSync("PRAGMA table_info(food)") as {
       name: string;
