@@ -2,7 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 interface ScreenWrapperProps {
   title: string;
@@ -16,12 +19,17 @@ export function ScreenWrapper({
   showBackButton,
 }: ScreenWrapperProps) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   return (
     <LinearGradient
       colors={["#022c22", "#000000"]} // Emerald 950 to Black
       className="flex-1"
     >
-      <SafeAreaView className="flex-1" edges={["top"]}>
+      <SafeAreaView
+        className="flex-1"
+        edges={["top"]}
+        style={{ paddingBottom: insets.bottom }}
+      >
         <View className="flex-row items-center gap-4 px-6 pb-4 border-b border-white/10">
           {showBackButton && (
             <TouchableOpacity onPress={() => router.back()}>

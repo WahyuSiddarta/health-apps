@@ -17,6 +17,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -32,6 +35,7 @@ export default function PersonalTargetScreen() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(1);
   const [target, setTarget] = useState<UserTarget | null>(null);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   // Form State
   const [nutrition, setNutrition] = useState({
@@ -60,6 +64,20 @@ export default function PersonalTargetScreen() {
 
   useEffect(() => {
     loadData();
+
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setIsKeyboardVisible(true),
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setIsKeyboardVisible(false),
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, []);
 
   const loadData = () => {
@@ -163,221 +181,233 @@ export default function PersonalTargetScreen() {
 
   return (
     <ScreenWrapper title={t("pages.personalTarget.title")} showBackButton>
-      <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
-        <View className="mb-8">
-          <Text className="mb-4 text-xl font-bold text-white">
-            {t("pages.personalTarget.nutritionTargets")}
-          </Text>
-          <View className="gap-4">
-            <InputField
-              label={t("pages.personalTarget.dailyCalories")}
-              value={nutrition.caloric}
-              onChangeText={(text) =>
-                setNutrition({ ...nutrition, caloric: text })
-              }
-              keyboardType="numeric"
-              placeholder="0"
-              useThousandSeparator
-            />
-            <View className="flex-row gap-4">
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.protein")}
-                  value={nutrition.protein}
-                  onChangeText={(text) =>
-                    setNutrition({ ...nutrition, protein: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.carbs")}
-                  value={nutrition.carbs}
-                  onChangeText={(text) =>
-                    setNutrition({ ...nutrition, carbs: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-            </View>
-            <View className="flex-row gap-4">
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.fat")}
-                  value={nutrition.fat}
-                  onChangeText={(text) =>
-                    setNutrition({ ...nutrition, fat: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.sugar")}
-                  value={nutrition.sugar}
-                  onChangeText={(text) =>
-                    setNutrition({ ...nutrition, sugar: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-            </View>
-          </View>
-        </View>
-
-        <View className="mb-8">
-          <Text className="mb-4 text-xl font-bold text-white">
-            {t("pages.personalTarget.bodyMeasurements")}
-          </Text>
-          <View className="gap-4">
-            <InputField
-              label={t("pages.personalTarget.targetBodyWeight")}
-              value={body.weight}
-              onChangeText={(text) => setBody({ ...body, weight: text })}
-              keyboardType="numeric"
-              placeholder="0"
-            />
-            <View className="flex-row gap-4">
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.visceralFat")}
-                  value={body.viceralFat}
-                  onChangeText={(text) =>
-                    setBody({ ...body, viceralFat: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.bodyFat")}
-                  value={body.fatPercentage}
-                  onChangeText={(text) =>
-                    setBody({ ...body, fatPercentage: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-            </View>
-          </View>
-        </View>
-
-        <View className="mb-8">
-          <SegmentedControl
-            label={t("pages.personalTarget.weightGoal")}
-            options={[
-              t("pages.personalTarget.weightLoss"),
-              t("pages.personalTarget.weightGain"),
-              t("pages.personalTarget.maintain"),
-            ]}
-            value={
-              weightGoal === "weight_loss"
-                ? t("pages.personalTarget.weightLoss")
-                : weightGoal === "weight_gain"
-                  ? t("pages.personalTarget.weightGain")
-                  : t("pages.personalTarget.maintain")
-            }
-            onChange={(displayValue) => {
-              if (displayValue === t("pages.personalTarget.weightLoss")) {
-                setWeightGoal("weight_loss");
-              } else if (
-                displayValue === t("pages.personalTarget.weightGain")
-              ) {
-                setWeightGoal("weight_gain");
-              } else {
-                setWeightGoal("maintain");
-              }
-            }}
-          />
-        </View>
-
-        <View className="mb-20">
-          <Text className="mb-4 text-xl font-bold text-white">
-            {t("pages.personalTarget.exerciseTargets")}
-          </Text>
-          <View className="gap-4">
-            <View className="flex-row gap-4">
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.minutes")}
-                  value={exercise.minutes}
-                  onChangeText={(text) =>
-                    setExercise({ ...exercise, minutes: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.sessions")}
-                  value={exercise.sessions}
-                  onChangeText={(text) =>
-                    setExercise({ ...exercise, sessions: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-            </View>
-            <InputField
-              label={t("pages.personalTarget.caloriesBurned")}
-              value={exercise.caloric}
-              onChangeText={(text) =>
-                setExercise({ ...exercise, caloric: text })
-              }
-              keyboardType="numeric"
-              placeholder="0"
-              useThousandSeparator
-            />
-            <View className="flex-row gap-4">
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.weightLiftingSessions")}
-                  value={exercise.weightLiftingSessions}
-                  onChangeText={(text) =>
-                    setExercise({ ...exercise, weightLiftingSessions: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-              <View className="flex-1">
-                <InputField
-                  label={t("pages.personalTarget.cardioMinutes")}
-                  value={exercise.cardioMinutes}
-                  onChangeText={(text) =>
-                    setExercise({ ...exercise, cardioMinutes: text })
-                  }
-                  keyboardType="numeric"
-                  placeholder="0"
-                />
-              </View>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-
-      <View
-        className="p-4 border-t border-white/10 bg-black/50"
-        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1, height: "100%" }}
+        keyboardVerticalOffset={isKeyboardVisible ? 120 : 0}
       >
-        <TouchableOpacity
-          onPress={handleSave}
-          className="items-center justify-center p-4 rounded-xl bg-primary"
+        <ScrollView
+          className="flex-1 p-4"
+          showsVerticalScrollIndicator={false}
+          // contentContainerStyle={{ paddingBottom: 120 }}
         >
-          <Text className="text-lg font-bold text-white">
-            {t("pages.personalTarget.saveChanges")}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <View className="mb-8">
+            <Text className="mb-4 text-xl font-bold text-white">
+              {t("pages.personalTarget.nutritionTargets")}
+            </Text>
+            <View className="gap-4">
+              <InputField
+                label={t("pages.personalTarget.dailyCalories")}
+                value={nutrition.caloric}
+                onChangeText={(text) =>
+                  setNutrition({ ...nutrition, caloric: text })
+                }
+                keyboardType="numeric"
+                placeholder="0"
+                useThousandSeparator
+              />
+              <View className="flex-row gap-4">
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.protein")}
+                    value={nutrition.protein}
+                    onChangeText={(text) =>
+                      setNutrition({ ...nutrition, protein: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.carbs")}
+                    value={nutrition.carbs}
+                    onChangeText={(text) =>
+                      setNutrition({ ...nutrition, carbs: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+              </View>
+              <View className="flex-row gap-4">
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.fat")}
+                    value={nutrition.fat}
+                    onChangeText={(text) =>
+                      setNutrition({ ...nutrition, fat: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.sugar")}
+                    value={nutrition.sugar}
+                    onChangeText={(text) =>
+                      setNutrition({ ...nutrition, sugar: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <View className="mb-8">
+            <Text className="mb-4 text-xl font-bold text-white">
+              {t("pages.personalTarget.bodyMeasurements")}
+            </Text>
+            <View className="gap-4">
+              <InputField
+                label={t("pages.personalTarget.targetBodyWeight")}
+                value={body.weight}
+                onChangeText={(text) => setBody({ ...body, weight: text })}
+                keyboardType="numeric"
+                placeholder="0"
+              />
+              <View className="flex-row gap-4">
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.visceralFat")}
+                    value={body.viceralFat}
+                    onChangeText={(text) =>
+                      setBody({ ...body, viceralFat: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.bodyFat")}
+                    value={body.fatPercentage}
+                    onChangeText={(text) =>
+                      setBody({ ...body, fatPercentage: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <View className="mb-8">
+            <SegmentedControl
+              label={t("pages.personalTarget.weightGoal")}
+              options={[
+                t("pages.personalTarget.weightLoss"),
+                t("pages.personalTarget.weightGain"),
+                t("pages.personalTarget.maintain"),
+              ]}
+              value={
+                weightGoal === "weight_loss"
+                  ? t("pages.personalTarget.weightLoss")
+                  : weightGoal === "weight_gain"
+                    ? t("pages.personalTarget.weightGain")
+                    : t("pages.personalTarget.maintain")
+              }
+              onChange={(displayValue) => {
+                if (displayValue === t("pages.personalTarget.weightLoss")) {
+                  setWeightGoal("weight_loss");
+                } else if (
+                  displayValue === t("pages.personalTarget.weightGain")
+                ) {
+                  setWeightGoal("weight_gain");
+                } else {
+                  setWeightGoal("maintain");
+                }
+              }}
+            />
+          </View>
+
+          <View className="mb-20">
+            <Text className="mb-4 text-xl font-bold text-white">
+              {t("pages.personalTarget.exerciseTargets")}
+            </Text>
+            <View className="gap-4">
+              <View className="flex-row gap-4">
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.minutes")}
+                    value={exercise.minutes}
+                    onChangeText={(text) =>
+                      setExercise({ ...exercise, minutes: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.sessions")}
+                    value={exercise.sessions}
+                    onChangeText={(text) =>
+                      setExercise({ ...exercise, sessions: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+              </View>
+              <InputField
+                label={t("pages.personalTarget.caloriesBurned")}
+                value={exercise.caloric}
+                onChangeText={(text) =>
+                  setExercise({ ...exercise, caloric: text })
+                }
+                keyboardType="numeric"
+                placeholder="0"
+                useThousandSeparator
+              />
+              <View className="flex-row gap-4">
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.weightLiftingSessions")}
+                    value={exercise.weightLiftingSessions}
+                    onChangeText={(text) =>
+                      setExercise({ ...exercise, weightLiftingSessions: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+                <View className="flex-1">
+                  <InputField
+                    label={t("pages.personalTarget.cardioMinutes")}
+                    value={exercise.cardioMinutes}
+                    onChangeText={(text) =>
+                      setExercise({ ...exercise, cardioMinutes: text })
+                    }
+                    keyboardType="numeric"
+                    placeholder="0"
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {!isKeyboardVisible && (
+        <View
+          className="p-4 border-t border-white/10 bg-black/50"
+          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        >
+          <TouchableOpacity
+            onPress={handleSave}
+            className="items-center justify-center p-4 rounded-xl bg-primary"
+          >
+            <Text className="text-lg font-bold text-white">
+              {t("pages.personalTarget.saveChanges")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </ScreenWrapper>
   );
 }

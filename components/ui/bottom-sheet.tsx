@@ -73,6 +73,7 @@ export function BottomSheet({
         >
           <View className="flex-row items-center justify-between p-4 border-b border-neutral-800">
             <ThemedText type="subtitle">{title || ""}</ThemedText>
+
             <TouchableOpacity onPress={onClose} className="p-2">
               <Ionicons name="close" size={24} color="#a3a3a3" />
             </TouchableOpacity>

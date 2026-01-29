@@ -1,6 +1,5 @@
 import { useOnboarding } from "@/context/onboarding-context";
 import { createUserProfile, saveUserTargets } from "@/database/operations";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   ACTIVITY_LEVELS,
   adjustCalories,
@@ -20,10 +19,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
-  const colorScheme = useColorScheme() ?? "light";
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { setHasCompletedOnboarding } = useOnboarding();
   const { t, i18n } = useTranslation();
@@ -508,7 +510,10 @@ export default function OnboardingScreen() {
   const step = steps[currentStep];
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-950">
+    <SafeAreaView
+      className="flex-1 bg-gray-950"
+      style={{ paddingBottom: insets.bottom }}
+    >
       <ScrollView className="flex-1" contentContainerClassName="px-6 py-8">
         <View className="mb-8">
           {/* Progress indicator */}
