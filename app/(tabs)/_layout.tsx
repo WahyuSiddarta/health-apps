@@ -1,16 +1,26 @@
-import { Tabs } from "expo-router";
+import { router, Tabs } from "expo-router";
 import React from "react";
 import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { useOnboarding } from "@/context/onboarding-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { t } = useTranslation();
+  const { hasCompletedOnboarding, isLoading } = useOnboarding();
+
+  // Prevent tabs from rendering if onboarding is not complete
+  if (isLoading || !hasCompletedOnboarding) {
+    setTimeout(() => {
+      router.replace("/onboarding");
+    }, 300);
+    return null;
+  }
 
   return (
     <Tabs

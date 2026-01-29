@@ -36,23 +36,32 @@ export default function DashboardScreen() {
   const [userTarget, setUserTarget] = useState<UserTarget | null>(null);
 
   const loadData = useCallback(() => {
-    const now = new Date();
-    const today = now.toISOString();
+    try {
+      const now = new Date();
+      const today = now.toISOString();
 
-    const food = getFood({ date: today });
-    setTodayFood(food);
+      const food = getFood({ date: today });
+      setTodayFood(food || []);
 
-    const exercise = getExercises({ date: today });
-    setTodayExercise(exercise);
+      const exercise = getExercises({ date: today });
+      setTodayExercise(exercise || []);
 
-    const weightLogs = getWeightLogs();
-    setLatestWeight(weightLogs.length > 0 ? weightLogs[0] : null);
+      const weightLogs = getWeightLogs();
+      setLatestWeight(
+        weightLogs && weightLogs.length > 0 ? weightLogs[0] : null,
+      );
 
-    // Get the current user profile to get the user_id, then fetch targets
-    const userProfile = getUserProfile();
-    if (userProfile) {
-      const target = getUserTarget(userProfile.user_id);
-      setUserTarget(target);
+      // Get the current user profile to get the user_id, then fetch targets
+      const userProfile = getUserProfile();
+
+      if (userProfile) {
+        const target = getUserTarget(userProfile.user_id);
+        setUserTarget(target);
+      } else {
+        setUserTarget(null);
+      }
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
     }
   }, []);
 
@@ -122,7 +131,7 @@ export default function DashboardScreen() {
         {/* <View className="flex-row items-center justify-end mb-4">
           <View className="flex-row justify-end gap-2">
             <TouchableOpacity
-              onPress={() => startTutorial()}
+              onPress={() => startTutorial(scrollViewRef)}
               className="px-3 py-2 ml-auto bg-blue-600 rounded-lg"
             >
               <Text className="text-xs font-medium text-white">

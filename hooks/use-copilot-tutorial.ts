@@ -9,39 +9,6 @@ import { useCopilot } from "react-native-copilot";
 
 const TUTORIAL_COMPLETED_KEY = "tutorial_completed";
 
-const TUTORIAL_STEPS = [
-  {
-    text: "Welcome! This is your health dashboard where you can track your daily progress.",
-    order: 0,
-    name: "dashboard_intro",
-  },
-  {
-    text: "This card shows your daily calorie tracking. See how many calories you've consumed, burned, and have remaining.",
-    order: 1,
-    name: "calorie_card",
-  },
-  {
-    text: "Track your weight progress over time. Your latest weight and trends are displayed here.",
-    order: 2,
-    name: "weight_progress",
-  },
-  {
-    text: "Use the Food tab to log your meals and monitor your daily calorie intake.",
-    order: 3,
-    name: "food_tab",
-  },
-  {
-    text: "Head to the Exercise tab to log your workouts and track calories burned.",
-    order: 4,
-    name: "exercise_tab",
-  },
-  {
-    text: "Configure your health targets and preferences in the Settings tab. Tap the help icon to restart this tutorial anytime!",
-    order: 5,
-    name: "settings_tab",
-  },
-];
-
 export const useCopilotTutorial = () => {
   const copilot = useCopilot();
   const [isTutorialCompleted, setIsTutorialCompleted] = useState(false);
@@ -95,12 +62,13 @@ export const useCopilotTutorial = () => {
 
   // Start the tutorial with error handling
   const startTutorial = useCallback(
-    (scrollViewRef?: React.RefObject<ScrollView | null>) => {
+    async (scrollViewRef?: React.RefObject<ScrollView | null>) => {
       try {
         console.log("startTutorial called, copilot:", !!copilot);
         if (copilot && typeof copilot.start === "function") {
           console.log("Starting tutorial now");
-          copilot.start();
+
+          copilot.start("calorie_card", scrollViewRef?.current || null);
         } else {
           console.warn("Copilot not ready", {
             copilot,

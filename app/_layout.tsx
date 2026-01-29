@@ -57,14 +57,11 @@ Sentry.init({
   // spotlight: __DEV__,
 });
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
-
 function RootLayoutContent() {
   const { hasCompletedOnboarding, isLoading } = useOnboarding();
 
   if (isLoading) {
+    console.log("Onboarding state is loading, showing loading indicator");
     return (
       <View className="items-center justify-center flex-1 bg-gray-950">
         <ActivityIndicator size="large" color="#10b981" />
@@ -73,15 +70,20 @@ function RootLayoutContent() {
   }
 
   if (!hasCompletedOnboarding) {
+    console.log("Rendering onboarding stack");
     return (
-      <Stack>
+      <Stack
+        screenOptions={{ headerShown: false }}
+        initialRouteName="onboarding"
+      >
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
       </Stack>
     );
   }
 
+  console.log("hasCompletedOnboarding:", hasCompletedOnboarding, isLoading);
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="personal-target" options={{ presentation: "card" }} />
       <Stack.Screen name="about" options={{ presentation: "card" }} />
@@ -112,6 +114,7 @@ function RootLayout() {
   }, []);
 
   if (!dbInitialized) {
+    console.log("Database not yet initialized, showing loading indicator");
     return (
       <View className="items-center justify-center flex-1 bg-gray-950">
         <ActivityIndicator size="large" color="#10b981" />
@@ -119,16 +122,17 @@ function RootLayout() {
     );
   }
 
+  console.log("Database initialized, rendering app");
   return (
     <I18nextProvider i18n={i18next}>
       <ToastProvider>
         <OnboardingProvider dbReady={dbInitialized}>
-          <CopilotContextProvider>
-            <ThemeProvider value={DarkTheme}>
+          <ThemeProvider value={DarkTheme}>
+            <CopilotContextProvider>
               <RootLayoutContent />
-              <StatusBar style="light" />
-            </ThemeProvider>
-          </CopilotContextProvider>
+              <StatusBar style="dark" />
+            </CopilotContextProvider>
+          </ThemeProvider>
         </OnboardingProvider>
       </ToastProvider>
     </I18nextProvider>

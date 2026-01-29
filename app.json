@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bugarin",
     "slug": "bugarin",
-    "version": "1.0.2",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/images/adaptive_icon_foreground_512.png",
     "scheme": "bugarin",
@@ -34,13 +34,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/splashscreen_logo.png",
+          "imageWidth": 500,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#10b981"
         }
       ],
       [

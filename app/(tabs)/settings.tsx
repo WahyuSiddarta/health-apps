@@ -54,7 +54,6 @@ export default function SettingsScreen() {
       setIsResetVisible(false);
       setIsDeleting(false);
       // Navigate to onboarding screen
-      router.replace("/onboarding");
     } catch (error) {
       captureException(error as Error, {
         category: "data-operation",

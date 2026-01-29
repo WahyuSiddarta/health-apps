@@ -454,6 +454,7 @@ export default function OnboardingScreen() {
         Number(height),
         goal,
       );
+      console.log("Onboarding - Created user profile with userId:", userId);
 
       // Calculate BMR and TDEE
       const bmr = calculateBMR({
@@ -475,7 +476,7 @@ export default function OnboardingScreen() {
 
       // Save targets with calculated calories using the newly created user_id
       if (userId) {
-        saveUserTargets(userId, {
+        const targetsSaved = saveUserTargets(userId, {
           nutrition_caloric: Math.round(dailyCalories),
           nutrition_protein: Math.round((dailyCalories * 0.3) / 4), // 30% protein
           nutrition_carbohydrate: Math.round((dailyCalories * 0.45) / 4), // 45% carbs
@@ -485,13 +486,15 @@ export default function OnboardingScreen() {
           weekly_exercise_sessions: 5,
           weekly_exercise_caloric: Math.round(tdee * 0.2 * 7),
         });
+        console.log("Onboarding - Saved user targets:", targetsSaved);
       }
 
       setHasCompletedOnboarding(true);
-      // Navigate to home screen after a brief delay
-      setTimeout(() => {
-        router.replace("/(tabs)");
-      }, 200);
+      console.log("Navigating to main app layout");
+      router.replace("/(tabs)");
+      // The navigation will automatically switch to (tabs) through RootLayoutContent
+      // when hasCompletedOnboarding state updates
+      console.log("Onboarding completed, hasCompletedOnboarding set to true");
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert(

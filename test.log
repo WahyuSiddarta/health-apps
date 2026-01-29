@@ -1,0 +1,32 @@
+Android Bundled 19560ms node_modules/expo-router/entry.js (2156 modules)
+ WARN  SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/th3rdwave/react-native-safe-area-context
+ LOG  [CodePush] Checking for update.
+ LOG  Database initialized successfully
+ LOG  CopilotProvider initialized and mounted
+ LOG  User profile check: null
+ LOG  Dashboard focused: tutorial not completed, resetting ref isTutorialCompleted= false
+ LOG  [CodePush] Downloading package.
+ LOG  Initializing tutorial
+ LOG  Get app setting: tutorial_completed = null
+ LOG  Tutorial completed status from DB: null
+ LOG  First time user - initializing tutorial setting to false
+ LOG  Set app setting: tutorial_completed = false
+ LOG  isCompleted: false
+ LOG  Registering tutorial steps with copilot
+ LOG  Tutorial initialized, completed: false
+ LOG  Starting tutorial: tutorialReady= true isTutorialCompleted= false
+ LOG  startTutorial called, copilot: true
+ LOG  Starting tutorial now
+ LOG  [CodePush] An unknown error occurred.
+ LOG  [CodePush] Update is invalid - A JS bundle file named "null" could not be found within the downloaded contents. Please check that you are releasing your CodePush updates using the exact same JS bundle file name that was shipped with your app's binary.
+ LOG  Initializing tutorial
+ LOG  Get app setting: tutorial_completed = false
+ LOG  Tutorial completed status from DB: false
+ LOG  isCompleted: false
+ LOG  Registering tutorial steps with copilot
+ LOG  Tutorial initialized, completed: false
+ LOG  Initializing tutorial
+ LOG  Get app setting: tutorial_completed = false
+ LOG  Tutorial completed status from DB: false
+ LOG  isCompleted: false
+ LOG  Tutorial initialized, completed: false

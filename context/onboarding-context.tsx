@@ -33,6 +33,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
   useEffect(() => {
     // Wait for database to be ready before checking onboarding status
     if (!dbReady) {
+      console.log("Database not ready yet, skipping onboarding check");
       return;
     }
 
@@ -42,11 +43,19 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
         const userProfile = getUserProfile();
         console.log("User profile check:", userProfile);
         if (userProfile) {
+          console.log("User profile exists, marking onboarding as completed");
           setHasCompletedOnboarding(true);
+        } else {
+          console.log(
+            "No user profile found, marking onboarding as not completed",
+          );
+          setHasCompletedOnboarding(false);
         }
       } catch (error) {
         console.error("Error checking onboarding status:", error);
+        setHasCompletedOnboarding(false);
       } finally {
+        console.log("Onboarding check complete, setting isLoading to false");
         setIsLoading(false);
       }
     };
@@ -56,6 +65,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
 
     // Safety timeout in case something hangs
     const timeout = setTimeout(() => {
+      console.log("Onboarding check timeout, forcing isLoading to false");
       setIsLoading(false);
     }, 3000);
 
