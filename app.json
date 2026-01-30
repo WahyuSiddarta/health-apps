@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bugarin",
     "slug": "bugarin",
-    "version": "1.0.8",
+    "version": "1.0.10",
     "orientation": "portrait",
     "icon": "./assets/images/adaptive_icon_foreground_512.png",
     "scheme": "bugarin",
